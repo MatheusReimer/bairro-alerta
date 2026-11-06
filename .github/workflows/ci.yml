@@ -44,3 +44,25 @@ jobs:
           name: cobertura
           path: coverage/
           retention-days: 14
+
+  regras:
+    name: Regras de segurança no Firebase Emulator
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - run: npm ci
+
+      - name: Testes das regras (Firestore e Storage)
+        run: npm run test:regras

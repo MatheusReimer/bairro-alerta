@@ -42,3 +42,9 @@ yarn-error.*
 
 # test coverage
 coverage/
+
+# segredos e configuração local (o modelo fica em .env.example)
+.env
+*-debug.log
+firebase-debug.log
+firestore-debug.log
