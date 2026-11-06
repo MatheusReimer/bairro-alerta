@@ -44,7 +44,7 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p regras",
     "test": "jest",
     "test:watch": "jest --watch --coverage=false",
-    "test:regras": "firebase emulators:exec --only firestore,storage --project demo-bairro-alerta \"jest -c jest.regras.config.js\"",
+    "test:regras": "node scripts/testar-regras.mjs",
     "e2e": "playwright test",
     "emuladores": "firebase emulators:start --project demo-bairro-alerta"
   },

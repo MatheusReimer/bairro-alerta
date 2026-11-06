@@ -1,6 +1,106 @@
 rules_version = '2';
+
+// Regras de acesso do Bairro Alerta. Repetem no servidor as regras de src/domain, porque o app no celular
+// não é confiável (OWASP Mobile Top 10: M3 autenticação/autorização insegura).
+// Testes: regras/__tests__/firestore.test.ts (npm run test:regras).
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} { allow read, write: if false; }
+
+    function logado() {
+      return request.auth != null;
+    }
+
+    function moderador() {
+      return logado() && exists(/databases/$(database)/documents/moderadores/$(request.auth.uid));
+    }
+
+    function camposOcorrencia() {
+      return ['autorId', 'categoria', 'descricao', 'fotoPath', 'local', 'status', 'oculta',
+              'apoios', 'apoiadores', 'criadaEm', 'historico'];
+    }
+
+    function localValido(l) {
+      return l is map && l.keys().hasOnly(['latitude', 'longitude'])
+        && l.latitude is number && l.longitude is number
+        && l.latitude >= -90 && l.latitude <= 90
+        && l.longitude >= -180 && l.longitude <= 180;
+    }
+
+    // Documento novo: do próprio autor, aberto, sem apoios, sem dados pessoais e com foto na pasta dele.
+    function novaValida(d) {
+      return d.keys().hasOnly(camposOcorrencia()) && d.keys().hasAll(camposOcorrencia())
+        && d.autorId == request.auth.uid
+        && d.categoria in ['buraco', 'iluminacao', 'entulho', 'calcada', 'alagamento', 'outros']
+        && d.descricao is string && d.descricao.size() <= 500
+        && d.fotoPath is string && d.fotoPath.matches('fotos/' + request.auth.uid + '/[^/]+')
+        && localValido(d.local)
+        && d.status == 'aberta' && d.oculta == false
+        && d.apoios == 0 && d.apoiadores.size() == 0
+        && d.criadaEm is number
+        && d.historico.size() == 1 && d.historico[0].status == 'aberta';
+    }
+
+    // "Eu também vi": soma exatamente 1 e acrescenta o próprio uid, uma vez, em ocorrência de outra pessoa.
+    function apoioValido(antes, depois) {
+      return logado()
+        && depois.diff(antes).affectedKeys().hasOnly(['apoios', 'apoiadores'])
+        && request.auth.uid != antes.autorId
+        && antes.status != 'resolvida' && antes.oculta == false
+        && !(request.auth.uid in antes.apoiadores)
+        && depois.apoiadores == antes.apoiadores.concat([request.auth.uid])
+        && depois.apoios == antes.apoios + 1;
+    }
+
+    function transicaoValida(de, para) {
+      return (de == 'aberta' && para == 'encaminhada')
+        || (de == 'encaminhada' && (para == 'em_andamento' || para == 'resolvida'))
+        || (de == 'em_andamento' && para == 'resolvida')
+        || (de == 'resolvida' && para == 'aberta');
+    }
+
+    // Moderação: muda status na sequência (registrando no histórico) e oculta ou reexibe. Nada mais.
+    function moderacaoValida(antes, depois) {
+      let n = antes.historico.size();
+      return moderador()
+        && depois.diff(antes).affectedKeys().hasOnly(['status', 'historico', 'oculta'])
+        && depois.oculta is bool
+        && (
+          (depois.status == antes.status && depois.historico == antes.historico)
+          || (transicaoValida(antes.status, depois.status)
+              && depois.historico.size() == n + 1
+              && depois.historico[0:n] == antes.historico
+              && depois.historico[n].status == depois.status)
+        );
+    }
+
+    match /moderadores/{uid} {
+      // A associação cadastra moderadores pelo console do Firebase. O app só consulta o próprio perfil.
+      allow get: if logado() && request.auth.uid == uid;
+      allow list, write: if false;
+    }
+
+    match /ocorrencias/{id} {
+      allow get: if logado() && (resource.data.oculta == false || moderador());
+      // Moradores precisam filtrar por oculta == false na consulta.
+      allow list: if moderador() || (logado() && resource.data.oculta == false);
+      allow create: if logado() && novaValida(request.resource.data);
+      allow update: if apoioValido(resource.data, request.resource.data)
+        || moderacaoValida(resource.data, request.resource.data);
+      allow delete: if false;
+    }
+
+    match /usuarios/{uid}/avisos/{avisoId} {
+      allow read: if logado() && request.auth.uid == uid;
+      allow create: if moderador()
+        && request.resource.data.keys().hasOnly(['ocorrenciaId', 'titulo', 'corpo', 'criadoEm', 'lido'])
+        && request.resource.data.keys().hasAll(['ocorrenciaId', 'titulo', 'corpo', 'criadoEm', 'lido'])
+        && request.resource.data.titulo is string && request.resource.data.titulo.size() <= 120
+        && request.resource.data.corpo is string && request.resource.data.corpo.size() <= 300
+        && request.resource.data.lido == false;
+      allow update: if logado() && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lido'])
+        && request.resource.data.lido == true;
+      allow delete: if false;
+    }
   }
 }
