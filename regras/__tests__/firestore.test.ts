@@ -8,6 +8,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   addDoc,
+  Bytes,
   collection,
   doc,
   getDoc,
@@ -26,7 +27,7 @@ const nova = (autorId: string) => ({
   autorId,
   categoria: 'buraco',
   descricao: 'Buraco fundo',
-  fotoPath: `fotos/${autorId}/1.jpg`,
+  fotoPath: `fotos/foto-${autorId}`,
   local: { latitude: -26.9, longitude: -49.09 },
   status: 'aberta',
   oculta: false,
@@ -35,6 +36,10 @@ const nova = (autorId: string) => ({
   criadaEm: 1000,
   historico: [{ status: 'aberta', em: 1000 }],
 });
+
+const jpeg = (tamanho = 4) => Bytes.fromUint8Array(new Uint8Array(tamanho).fill(0xff));
+const foto = (autorId: string, tamanho?: number) => ({ autorId, jpeg: jpeg(tamanho), criadaEm: 1000 });
+const LIMITE_FOTO = 700 * 1024;
 
 const db = (uid?: string) => (uid ? env.authenticatedContext(uid) : env.unauthenticatedContext()).firestore();
 
@@ -52,6 +57,8 @@ beforeEach(async () => {
   await env.withSecurityRulesDisabled(async (ctx) => {
     const admin = ctx.firestore();
     await setDoc(doc(admin, 'moderadores/mod'), { nome: 'Associação' });
+    await setDoc(doc(admin, 'fotos/foto-joao'), foto('joao'));
+    await setDoc(doc(admin, 'fotos/foto-maria'), foto('maria'));
     await setDoc(doc(admin, 'ocorrencias/oc1'), nova('joao'));
     await setDoc(doc(admin, 'ocorrencias/oculta'), { ...nova('joao'), oculta: true });
     await setDoc(doc(admin, 'usuarios/joao/avisos/a1'), {
@@ -114,8 +121,11 @@ describe('criação (história #4)', () => {
     await assertFails(addDoc(collection(db('maria'), 'ocorrencias'), { ...nova('maria'), email: 'maria@x.com' }));
   });
 
-  it('não aponta para foto de outra pessoa', async () => {
-    await assertFails(addDoc(collection(db('maria'), 'ocorrencias'), { ...nova('maria'), fotoPath: 'fotos/joao/1.jpg' }));
+  it('não aponta para foto de outra pessoa nem para foto inexistente', async () => {
+    const col = collection(db('maria'), 'ocorrencias');
+    await assertFails(addDoc(col, { ...nova('maria'), fotoPath: 'fotos/foto-joao' }));
+    await assertFails(addDoc(col, { ...nova('maria'), fotoPath: 'fotos/nao-existe' }));
+    await assertFails(addDoc(col, { ...nova('maria'), fotoPath: 'ocorrencias/oc1' }));
   });
 });
 
@@ -192,5 +202,40 @@ describe('avisos (história #9)', () => {
     lote.update(doc(m, 'ocorrencias/oc1'), { status: 'encaminhada', historico: [{ status: 'aberta', em: 1000 }, { status: 'encaminhada', em: 2 }] });
     lote.set(doc(collection(m, 'usuarios/joao/avisos')), aviso);
     await assertSucceeds(lote.commit());
+  });
+});
+
+describe('fotos (T-SEG-03)', () => {
+  it('morador envia foto na própria conta', async () => {
+    await assertSucceeds(addDoc(collection(db('maria'), 'fotos'), foto('maria')));
+  });
+
+  it('não envia foto em nome de outra pessoa', async () => {
+    await assertFails(addDoc(collection(db('maria'), 'fotos'), foto('joao')));
+  });
+
+  it('visitante sem login não envia nem vê fotos', async () => {
+    await assertFails(addDoc(collection(db(), 'fotos'), foto('maria')));
+    await assertFails(getDoc(doc(db(), 'fotos/foto-maria')));
+  });
+
+  it('morador logado vê as fotos', async () => {
+    await assertSucceeds(getDoc(doc(db('joao'), 'fotos/foto-maria')));
+  });
+
+  it('não aceita foto acima de 700 KB nem conteúdo que não seja binário', async () => {
+    const col = collection(db('maria'), 'fotos');
+    await assertSucceeds(addDoc(col, foto('maria', LIMITE_FOTO)));
+    await assertFails(addDoc(col, foto('maria', LIMITE_FOTO + 1)));
+    await assertFails(addDoc(col, { autorId: 'maria', jpeg: 'texto', criadaEm: 1 }));
+  });
+
+  it('não aceita campos extras', async () => {
+    await assertFails(addDoc(collection(db('maria'), 'fotos'), { ...foto('maria'), email: 'maria@x.com' }));
+  });
+
+  it('ninguém altera nem apaga foto enviada', async () => {
+    await assertFails(setDoc(doc(db('maria'), 'fotos/foto-maria'), foto('maria')));
+    await assertFails(updateDoc(doc(db('maria'), 'fotos/foto-maria'), { criadaEm: 2 }));
   });
 });

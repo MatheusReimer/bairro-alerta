@@ -1,11 +1,11 @@
-// Sobe o Firestore e o Storage no emulador, roda os testes das regras e derruba tudo no final.
+// Sobe o Firestore no emulador, roda os testes das regras e derruba tudo no final.
 import { spawnSync } from 'node:child_process';
 
 import { subirEmuladores, variaveisEmulador, windows } from './emuladores.mjs';
 
 let derrubar;
 try {
-  derrubar = await subirEmuladores(['firestore', 'storage']);
+  derrubar = await subirEmuladores(['firestore']);
 } catch (erro) {
   console.error(erro.message);
   process.exit(1);
