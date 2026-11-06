@@ -19,7 +19,25 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/favicon.png",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "O Bairro Alerta usa a câmera para fotografar o problema que você quer registrar.",
+          "photosPermission": "O Bairro Alerta usa suas fotos para anexar uma imagem do problema."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "O Bairro Alerta usa sua localização para marcar o problema no mapa."
+        }
+      ]
+    ],
+    "scheme": "bairroalerta"
   }
 }
