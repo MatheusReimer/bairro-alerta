@@ -39,6 +39,19 @@ describe('ServicoOcorrencias.registrar (história #4)', () => {
   });
 });
 
+describe('ServicoOcorrencias.registrar: tamanho da foto', () => {
+  it('recusa foto acima de 700 KB sem enviar nada', async () => {
+    const { repo, lerFoto, servico } = montar([]);
+    const grande = new Uint8Array(700 * 1024 + 10);
+    grande.set([0xff, 0xd8, 0xff, 0xda, 0x00, 0x02]);
+    lerFoto.mockResolvedValue(grande);
+
+    await expect(servico.registrar(rascunho, maria)).rejects.toThrow('A foto ficou grande demais. Tente tirar de novo.');
+    expect(repo.fotos.size).toBe(0);
+    expect(repo.todas()).toHaveLength(0);
+  });
+});
+
 describe('ServicoOcorrencias.apoiar (história #7)', () => {
   it('grava o apoio', async () => {
     const { repo, servico } = montar();
