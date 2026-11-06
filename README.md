@@ -10,7 +10,7 @@ Projeto acadêmico (UNIVALI, Análise e Desenvolvimento de Sistemas), desenvolvi
 
 - React Native com Expo (SDK 58) e TypeScript
 - Jest (`jest-expo`) e React Native Testing Library para testes unitários e de componente
-- Maestro para testes ponta a ponta (a partir da Sprint 4)
+- Playwright para testes ponta a ponta no build web, com o Firebase Emulator
 - Firebase (Auth, Firestore, Storage, Cloud Messaging) com o Emulator Suite nos testes
 - GitHub Actions: lint, verificação de tipos, testes e cobertura a cada push e pull request
 
@@ -21,7 +21,10 @@ Requer Node.js 22.
 ```bash
 npm install
 npm start          # abre o Expo; leia o QR code com o app Expo Go no Android
-npm test           # testes com relatório de cobertura em coverage/
+npm test           # testes unitários e de tela, com cobertura em coverage/
+npm run test:regras  # regras do Firestore e do Storage no Firebase Emulator (Java 17+)
+npm run e2e        # ponta a ponta: build web + emuladores + Playwright; capturas em docs/capturas
+npm run emuladores # sobe o Firebase Emulator para usar o app localmente (.env a partir do .env.example)
 npm run lint
 npm run typecheck
 ```
@@ -29,6 +32,8 @@ npm run typecheck
 ## Documentos
 
 - [Plano de testes](docs/plano-de-testes.md)
+- [Questionário com moradores](docs/questionario-moradores.md)
+- [Guia do piloto](docs/guia-piloto.md)
 - Quadro Scrum: Trello "Bairro Alerta - Scrum"
 
 ## Fluxo de trabalho
