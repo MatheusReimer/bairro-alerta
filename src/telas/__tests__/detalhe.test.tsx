@@ -96,7 +96,7 @@ describe('Avisos (história #9)', () => {
     await user.press(await screen.findByRole('button', { name: 'Avisos, 1 não lido' }));
     await user.press(await screen.findByRole('button', { name: /Iluminação: Encaminhada à prefeitura/ }));
 
-    expect(await screen.findByText('Poste apagado há uma semana')).toBeOnTheScreen();
+    expect(await screen.findByRole('header', { name: 'Iluminação' })).toBeOnTheScreen();
     expect(repositorio.avisosDe(UID_MARIA)[0].lido).toBe(true);
   });
 

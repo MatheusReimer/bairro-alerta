@@ -70,7 +70,7 @@ describe('Registrar ocorrência (histórias #4 e #6)', () => {
     expect(screen.getByRole('button', { name: 'Criar nova mesmo assim' })).toBeOnTheScreen();
     await user.press(screen.getByRole('button', { name: 'Apoiar esta' }));
 
-    expect(await screen.findByText('1 apoio')).toBeOnTheScreen();
+    expect(await screen.findByText('Você apoiou esta ocorrência')).toBeOnTheScreen();
     expect(repositorio.todas()).toHaveLength(1);
     expect(repositorio.todas()[0].apoiadores).toEqual([UID_MARIA]);
   });

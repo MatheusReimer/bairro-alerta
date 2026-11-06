@@ -10,5 +10,10 @@
         "./src/*"
       ]
     }
-  }
+  },
+  "exclude": [
+    "regras",
+    "e2e",
+    "node_modules"
+  ]
 }
