@@ -66,3 +66,37 @@ jobs:
 
       - name: Testes das regras (Firestore e Storage)
         run: npm run test:regras
+
+  e2e:
+    name: Testes ponta a ponta (web + Firebase Emulator)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - name: Playwright
+        run: npm run e2e
+
+      - name: Relatório e capturas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e
+          path: |
+            e2e-relatorio/
+            docs/capturas/
+          retention-days: 14

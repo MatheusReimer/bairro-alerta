@@ -14,6 +14,8 @@
   "exclude": [
     "regras",
     "e2e",
-    "node_modules"
+    "node_modules",
+    "playwright.config.ts",
+    "dist-e2e"
   ]
 }

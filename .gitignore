@@ -48,3 +48,8 @@ coverage/
 *-debug.log
 firebase-debug.log
 firestore-debug.log
+
+# testes ponta a ponta
+dist-e2e/
+e2e-relatorio/
+test-results/
