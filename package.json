@@ -46,7 +46,9 @@
     "test:watch": "jest --watch --coverage=false",
     "test:regras": "node scripts/testar-regras.mjs",
     "e2e": "node scripts/e2e.mjs",
-    "emuladores": "firebase emulators:start --project demo-bairro-alerta"
+    "emuladores": "firebase emulators:start --project demo-bairro-alerta",
+    "fumaca": "node scripts/fumaca-producao.mjs",
+    "publicar": "expo export --platform web --output-dir dist-web --clear && firebase deploy --only firestore:rules,hosting"
   },
   "private": true,
   "jest": {
