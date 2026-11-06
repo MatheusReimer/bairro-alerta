@@ -54,3 +54,4 @@ dist-e2e/
 e2e-relatorio/
 test-results/
 dist-web/
+.firebase/
