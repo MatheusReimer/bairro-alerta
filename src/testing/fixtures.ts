@@ -1,4 +1,4 @@
-import type { Ocorrencia } from '../ocorrencia';
+import type { Ocorrencia } from '../domain/ocorrencia';
 
 // Praça Vila Nova, Blumenau (ponto de referência dos testes).
 export const PRACA = { latitude: -26.9055, longitude: -49.0943 };

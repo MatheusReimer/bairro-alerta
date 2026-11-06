@@ -1,5 +1,5 @@
 import { filtrarOcorrencias } from '../lista';
-import { ocorrencia } from './fixtures';
+import { ocorrencia } from '../../testing/fixtures';
 
 const buraco = ocorrencia({ categoria: 'buraco', status: 'aberta', criadaEm: 10 });
 const poste = ocorrencia({ categoria: 'iluminacao', status: 'encaminhada', criadaEm: 30 });

@@ -35,7 +35,8 @@
     "collectCoverageFrom": [
       "App.tsx",
       "src/**/*.{ts,tsx}",
-      "!**/*.d.ts"
+      "!**/*.d.ts",
+      "!src/testing/**"
     ],
     "coverageReporters": [
       "text-summary",

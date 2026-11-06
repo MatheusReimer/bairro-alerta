@@ -1,5 +1,5 @@
 import { distanciaMetros, RAIO_SEMELHANTES_M, sugerirSemelhantes } from '../semelhantes';
-import { aoNorte, ocorrencia, PRACA } from './fixtures';
+import { aoNorte, ocorrencia, PRACA } from '../../testing/fixtures';
 
 describe('distanciaMetros', () => {
   it('é zero para o mesmo ponto', () => {
@@ -10,7 +10,7 @@ describe('distanciaMetros', () => {
     expect(distanciaMetros(PRACA, aoNorte(100))).toBeCloseTo(100, 0);
   });
 
-  it('mede a distância entre Blumenau e Florianópolis (~110 km)', () => {
+  it('mede a distância entre Blumenau e Florianópolis (~94 km)', () => {
     const floripa = { latitude: -27.5954, longitude: -48.548 };
     expect(distanciaMetros(PRACA, floripa) / 1000).toBeCloseTo(94.3, 0);
   });
