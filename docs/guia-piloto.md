@@ -18,22 +18,28 @@ O relatório final vence em **30/11/2026**. Para sobrar tempo de analisar os dad
 
 ## 2. Antes de começar (equipe)
 
-1. Criar um projeto no Firebase (plano gratuito Spark) e ativar Authentication (e-mail e senha), Firestore e Storage.
-2. Publicar as regras: `npx firebase deploy --only firestore:rules,storage --project <id-do-projeto>`.
+1. Criar um projeto no Firebase (plano gratuito Spark) e ativar Authentication (e-mail e senha) e Firestore.
+   Não é preciso o Storage: as fotos ficam no Firestore.
+2. Publicar as regras: `npx firebase deploy --only firestore:rules --project <id-do-projeto>`.
 3. Preencher o `.env` com as chaves do app web do projeto e `EXPO_PUBLIC_USE_EMULATORS=0`.
-4. Gerar a versão de testes (ver Seção 3).
+4. Publicar a versão web (ver Seção 3).
 5. Cadastrar os moderadores: depois que a pessoa da associação criar a conta no app, copiar o UID dela em
    Authentication e criar no Firestore o documento `moderadores/<UID>` com o campo `nome`.
 6. Fazer um teste completo com dois celulares antes de convidar os moradores.
 
 ## 3. Como os moradores instalam
 
-> A forma de distribuição ainda está em decisão. As opções abaixo usam o mesmo código e o mesmo banco.
+Não é preciso instalar nada. O piloto usa a versão web do Bairro Alerta, publicada no Firebase Hosting (gratuito):
 
-- **Android (recomendado):** arquivo APK gerado pelo EAS Build (`npx eas-cli@latest build -p android --profile preview`),
-  enviado por link. O morador permite "instalar de fontes desconhecidas" uma vez.
-- **iPhone ou quem não quiser instalar:** versão web publicada no Firebase Hosting, aberta pelo navegador do celular.
-  Câmera e GPS funcionam; o mapa aparece como lista de pontos.
+```
+npx expo export --platform web --output-dir dist-web
+npx firebase deploy --only hosting --project <id-do-projeto>
+```
+
+O morador abre o link (`https://<id-do-projeto>.web.app`) no navegador do celular, Android ou iPhone. Dica para
+mandar no grupo: "abra o link e toque em Compartilhar > Adicionar à tela inicial para ficar como um app".
+Câmera e GPS funcionam pelo navegador; o mapa aparece como lista de pontos com link para o OpenStreetMap.
+O app nativo (com mapa interativo) é demonstrado pela equipe com o Expo Go.
 
 ## 4. Roteiro para os participantes
 

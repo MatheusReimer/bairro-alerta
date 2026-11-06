@@ -5,10 +5,10 @@ import { AutenticacaoFirebase, RepositorioFirestore } from './firestore';
 
 /** Liga as telas ao Firebase e aos recursos do aparelho (câmera, GPS). */
 export function criarAmbienteReal(): Ambiente {
-  const { auth, db, storage } = firebase();
+  const { auth, db } = firebase();
   return {
     autenticacao: new AutenticacaoFirebase(auth, db),
-    repositorio: new RepositorioFirestore(db, storage),
+    repositorio: new RepositorioFirestore(db),
     localizacao: localizacaoExpo,
     obterFoto,
     lerFoto,

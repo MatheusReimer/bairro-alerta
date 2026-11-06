@@ -11,7 +11,7 @@ Projeto acadêmico (UNIVALI, Análise e Desenvolvimento de Sistemas), desenvolvi
 - React Native com Expo (SDK 58) e TypeScript
 - Jest (`jest-expo`) e React Native Testing Library para testes unitários e de componente
 - Playwright para testes ponta a ponta no build web, com o Firebase Emulator
-- Firebase (Auth, Firestore, Storage, Cloud Messaging) com o Emulator Suite nos testes
+- Firebase (Auth, Firestore, Hosting) no plano gratuito, com o Emulator Suite nos testes; as fotos ficam no Firestore
 - GitHub Actions: lint, verificação de tipos, testes e cobertura a cada push e pull request
 
 ## Como rodar
@@ -22,7 +22,7 @@ Requer Node.js 22.
 npm install
 npm start          # abre o Expo; leia o QR code com o app Expo Go no Android
 npm test           # testes unitários e de tela, com cobertura em coverage/
-npm run test:regras  # regras do Firestore e do Storage no Firebase Emulator (Java 17+)
+npm run test:regras  # regras do Firestore no Firebase Emulator (Java 17+)
 npm run e2e        # ponta a ponta: build web + emuladores + Playwright; capturas em docs/capturas
 npm run emuladores # sobe o Firebase Emulator para usar o app localmente (.env a partir do .env.example)
 npm run lint

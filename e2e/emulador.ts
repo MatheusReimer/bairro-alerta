@@ -2,7 +2,6 @@
 const PROJETO = 'demo-bairro-alerta';
 const FIRESTORE = `http://127.0.0.1:8181`;
 const AUTH = `http://127.0.0.1:9099`;
-const STORAGE = `http://127.0.0.1:9199`;
 const DOCS = `${FIRESTORE}/v1/projects/${PROJETO}/databases/(default)/documents`;
 const ADMIN = { Authorization: 'Bearer owner' };
 
@@ -44,7 +43,9 @@ export async function lerOcorrencias(): Promise<DocOcorrencia[]> {
   return documents.map((d) => ({ id: d.name.split('/').pop()!, campos: d.fields }));
 }
 
+/** Lê a foto gravada na coleção `fotos` (campo binário jpeg). */
 export async function baixarFoto(fotoPath: string): Promise<Buffer> {
-  const url = `${STORAGE}/v0/b/${PROJETO}.appspot.com/o/${encodeURIComponent(fotoPath)}?alt=media`;
-  return Buffer.from(await (await ok(await fetch(url, { headers: ADMIN }))).arrayBuffer());
+  const resposta = await ok(await fetch(`${DOCS}/${fotoPath}`, { headers: ADMIN }));
+  const { fields } = (await resposta.json()) as { fields: { jpeg: { bytesValue: string } } };
+  return Buffer.from(fields.jpeg.bytesValue, 'base64');
 }

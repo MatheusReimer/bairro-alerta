@@ -52,7 +52,7 @@ export class RepositorioMemoria implements Repositorio {
   }
 
   async enviarFoto(uid: string, jpeg: Uint8Array): Promise<string> {
-    const path = `fotos/${uid}/${++this.sequencia}.jpg`;
+    const path = `fotos/foto-${uid}-${++this.sequencia}`;
     this.fotos.set(path, jpeg);
     return path;
   }

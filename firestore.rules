@@ -26,13 +26,20 @@ service cloud.firestore {
         && l.longitude >= -180 && l.longitude <= 180;
     }
 
+    // A foto precisa existir e ter sido enviada pela mesma pessoa que registra a ocorrência.
+    function fotoDoAutor(fotoId) {
+      let caminho = /databases/$(database)/documents/fotos/$(fotoId);
+      return exists(caminho) && get(caminho).data.autorId == request.auth.uid;
+    }
+
     // Documento novo: do próprio autor, aberto, sem apoios, sem dados pessoais e com foto na pasta dele.
     function novaValida(d) {
       return d.keys().hasOnly(camposOcorrencia()) && d.keys().hasAll(camposOcorrencia())
         && d.autorId == request.auth.uid
         && d.categoria in ['buraco', 'iluminacao', 'entulho', 'calcada', 'alagamento', 'outros']
         && d.descricao is string && d.descricao.size() <= 500
-        && d.fotoPath is string && d.fotoPath.matches('fotos/' + request.auth.uid + '/[^/]+')
+        && d.fotoPath is string && d.fotoPath.matches('fotos/[A-Za-z0-9_-]+')
+        && fotoDoAutor(d.fotoPath.split('/')[1])
         && localValido(d.local)
         && d.status == 'aberta' && d.oculta == false
         && d.apoios == 0 && d.apoiadores.size() == 0
@@ -77,6 +84,20 @@ service cloud.firestore {
       // A associação cadastra moderadores pelo console do Firebase. O app só consulta o próprio perfil.
       allow get: if logado() && request.auth.uid == uid;
       allow list, write: if false;
+    }
+
+    // Fotos das ocorrências, já reduzidas e sem metadados pelo app. Ficam no Firestore porque o Cloud Storage
+    // exige o plano pago do Firebase. Limite: 700 KB (o documento inteiro pode ter até 1 MiB).
+    match /fotos/{fotoId} {
+      allow read: if logado();
+      allow create: if logado()
+        && request.resource.data.keys().hasOnly(['autorId', 'jpeg', 'criadaEm'])
+        && request.resource.data.keys().hasAll(['autorId', 'jpeg', 'criadaEm'])
+        && request.resource.data.autorId == request.auth.uid
+        && request.resource.data.jpeg is bytes
+        && request.resource.data.jpeg.size() <= 700 * 1024
+        && request.resource.data.criadaEm is number;
+      allow update, delete: if false;
     }
 
     match /ocorrencias/{id} {

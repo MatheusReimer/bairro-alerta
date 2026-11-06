@@ -6,6 +6,9 @@ import { ErroRegra, type Ator } from '../domain/regras';
 import type { Repositorio } from '../dados/tipos';
 import { removerMetadados } from './exif';
 
+/** Limite de uma foto no Firestore (documento de até 1 MiB). Repetido em firestore.rules. */
+export const FOTO_MAXIMA_BYTES = 700 * 1024;
+
 export type Dependencias = {
   /** Lê a foto já comprimida em JPEG a partir da URI local. */
   lerFoto(uri: string): Promise<Uint8Array>;
@@ -24,6 +27,7 @@ export class ServicoOcorrencias {
     if (erros.length > 0) throw new ErroRegra(erros[0]!);
 
     const foto = removerMetadados(await this.deps.lerFoto(rascunho.fotoUri!));
+    if (foto.length > FOTO_MAXIMA_BYTES) throw new ErroRegra('A foto ficou grande demais. Tente tirar de novo.');
     const fotoPath = await this.repo.enviarFoto(autor.uid, foto);
     return this.repo.inserir(criarOcorrencia(rascunho, autor.uid, fotoPath, this.deps.agora()));
   }

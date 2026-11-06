@@ -8,6 +8,7 @@ import {
 } from 'firebase/auth';
 import {
   addDoc,
+  Bytes,
   collection,
   doc,
   getDoc,
@@ -19,7 +20,6 @@ import {
   where,
   type Firestore,
 } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadBytes, type FirebaseStorage } from 'firebase/storage';
 
 import type { NovaOcorrencia, Ocorrencia } from '../domain/ocorrencia';
 import {
@@ -32,12 +32,14 @@ import {
   type Usuario,
 } from '../dados/tipos';
 
-/** Repositório no Cloud Firestore e Cloud Storage. A autorização é garantida por firestore.rules e storage.rules. */
+/**
+ * Repositório no Cloud Firestore. A autorização é garantida por firestore.rules.
+ * As fotos ficam na coleção `fotos` (o Cloud Storage exige o plano pago do Firebase).
+ */
 export class RepositorioFirestore implements Repositorio {
-  constructor(
-    private readonly db: Firestore,
-    private readonly storage: FirebaseStorage,
-  ) {}
+  private readonly cacheFotos = new Map<string, string>();
+
+  constructor(private readonly db: Firestore) {}
 
   observarOcorrencias(moderador: boolean, aoMudar: (lista: Ocorrencia[]) => void): Cancelar {
     const col = collection(this.db, 'ocorrencias');
@@ -50,13 +52,22 @@ export class RepositorioFirestore implements Repositorio {
   }
 
   async enviarFoto(uid: string, jpeg: Uint8Array): Promise<string> {
-    const path = `fotos/${uid}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
-    await uploadBytes(ref(this.storage, path), jpeg, { contentType: 'image/jpeg' });
-    return path;
+    const foto = await addDoc(collection(this.db, 'fotos'), {
+      autorId: uid,
+      jpeg: Bytes.fromUint8Array(jpeg),
+      criadaEm: Date.now(),
+    });
+    return `fotos/${foto.id}`;
   }
 
-  urlDaFoto(fotoPath: string): Promise<string> {
-    return getDownloadURL(ref(this.storage, fotoPath));
+  async urlDaFoto(fotoPath: string): Promise<string> {
+    const emCache = this.cacheFotos.get(fotoPath);
+    if (emCache) return emCache;
+    const snap = await getDoc(doc(this.db, fotoPath));
+    if (!snap.exists()) throw new Error('Foto não encontrada.');
+    const url = `data:image/jpeg;base64,${(snap.data().jpeg as Bytes).toBase64()}`;
+    this.cacheFotos.set(fotoPath, url);
+    return url;
   }
 
   async inserir(nova: NovaOcorrencia): Promise<string> {

@@ -1,4 +1,4 @@
-// Testes ponta a ponta: gera o build web apontando para os emuladores, sobe Auth/Firestore/Storage,
+// Testes ponta a ponta: gera o build web apontando para os emuladores, sobe Auth e Firestore,
 // roda o Playwright (que serve o build) e derruba tudo no final.
 // Uso: npm run e2e            (com build)
 //      npm run e2e -- --sem-build [argumentos do playwright]
@@ -23,7 +23,7 @@ if (!semBuild) {
 
 let derrubar;
 try {
-  derrubar = await subirEmuladores(['auth', 'firestore', 'storage']);
+  derrubar = await subirEmuladores(['auth', 'firestore']);
 } catch (erro) {
   console.error(erro.message);
   process.exit(1);

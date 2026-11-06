@@ -3,7 +3,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import net from 'node:net';
 
-export const PORTAS = { auth: 9099, firestore: 8181, storage: 9199 };
+export const PORTAS = { auth: 9099, firestore: 8181 };
 export const PROJETO = 'demo-bairro-alerta';
 export const windows = process.platform === 'win32';
 
@@ -58,6 +58,5 @@ export async function subirEmuladores(servicos) {
 
 export const variaveisEmulador = {
   FIRESTORE_EMULATOR_HOST: `127.0.0.1:${PORTAS.firestore}`,
-  FIREBASE_STORAGE_EMULATOR_HOST: `127.0.0.1:${PORTAS.storage}`,
   FIREBASE_AUTH_EMULATOR_HOST: `127.0.0.1:${PORTAS.auth}`,
 };

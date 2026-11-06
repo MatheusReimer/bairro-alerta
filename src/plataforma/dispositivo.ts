@@ -4,8 +4,8 @@ import * as Location from 'expo-location';
 
 import type { ProvedorLocalizacao } from '../servicos/localizacao';
 
-/** Lado maior da foto enviada: suficiente para ver o problema, leve para o plano gratuito e para o 4G. */
-const LADO_MAXIMO = 1280;
+/** Lado maior da foto: suficiente para ver o problema e, em JPEG 60%, bem abaixo do limite de 700 KB. */
+const LADO_MAXIMO = 1024;
 
 export type OrigemFoto = 'camera' | 'galeria';
 
@@ -31,7 +31,7 @@ export async function obterFoto(origem: OrigemFoto): Promise<string | null> {
     contexto.resize(foto.width >= foto.height ? { width: LADO_MAXIMO } : { height: LADO_MAXIMO });
   }
   const imagem = await contexto.renderAsync();
-  const salva = await imagem.saveAsync({ format: SaveFormat.JPEG, compress: 0.7 });
+  const salva = await imagem.saveAsync({ format: SaveFormat.JPEG, compress: 0.6 });
   return salva.uri;
 }
 

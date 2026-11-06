@@ -1,6 +1,6 @@
 # Plano de Testes: Bairro Alerta
 
-Versão 1.0, Sprint 1 (outubro de 2026). Acadêmico: Matheus Reimer.
+Versão 1.1, Sprint 2 (novembro de 2026). Acadêmico: Matheus Reimer.
 
 ## 1. Objetivo
 
@@ -23,8 +23,8 @@ escopo do projeto.
 |---|---|---|---|
 | Unitário | Regras de domínio (validação, status, apoios, distância) e serviços com dependências simuladas | Jest (`jest-expo`), com `jest.mock` para câmera, GPS e Firebase | Local e GitHub Actions |
 | Componente | Telas isoladas: campos obrigatórios, mensagens de erro, botões habilitados ou não | Jest e React Native Testing Library | Local e GitHub Actions |
-| Integração | Fluxo completo no app com o Firebase Emulator Suite (Auth, Firestore, Storage) | Maestro (testes ponta a ponta) | Emulador Android |
-| Regras de acesso | Regras do Firestore e do Storage: quem lê, quem escreve, quem modera | `@firebase/rules-unit-testing` no emulador | Local e GitHub Actions |
+| Integração | Fluxo completo no app com o Firebase Emulator Suite (Auth, Firestore) | Playwright no build web (testes ponta a ponta) | Local e GitHub Actions |
+| Regras de acesso | Regras do Firestore (ocorrências, fotos, avisos): quem lê, quem escreve, quem modera | `@firebase/rules-unit-testing` no emulador | Local e GitHub Actions |
 | Manual | Uso em smartphone Android real e piloto com moradores | Roteiro da Seção 7 | Dispositivo real |
 
 A maior parte dos testes fica nos níveis unitário e de componente, que são rápidos e rodam a cada alteração.
@@ -66,7 +66,7 @@ Identificador: `T-<história>-<número>`. Tipo: U = unitário, C = componente (t
 | T-04-07 | U | Ocorrência nova | Começa com status "aberta" |
 | T-04-08 | C | Ocorrência exibida para outro usuário | Nome do autor não aparece |
 | T-04-09 | U | GPS negado pelo usuário (serviço simulado) | Erro claro e registro não enviado |
-| T-04-10 | I | Fotografar, categorizar, enviar e ver na lista | Ocorrência salva no Firestore e foto no Storage |
+| T-04-10 | I | Fotografar, categorizar, enviar e ver na lista | Ocorrência e foto salvas no Firestore, foto sem EXIF |
 
 ### #5 Lista e mapa
 
@@ -124,7 +124,7 @@ Base: OWASP Mobile Top 10 (OWASP FOUNDATION, 2024) e LGPD (BRASIL, 2018).
 |---|---|---|---|
 | T-SEG-01 | R | Usuário não autenticado lê ocorrências | Negado |
 | T-SEG-02 | R | Usuário edita ocorrência de outra pessoa | Negado |
-| T-SEG-03 | R | Upload no Storage de arquivo que não é imagem ou acima de 5 MB | Negado |
+| T-SEG-03 | R | Foto que não é binária, acima de 700 KB, em nome de outra pessoa ou sobrescrevendo outra | Negado |
 | T-SEG-04 | U | Dados enviados ao Firestore | Sem e-mail ou nome do autor no documento público |
 | T-SEG-05 | Revisão | Chaves e segredos no repositório | Nenhum segredo versionado (verificação no CI) |
 
@@ -163,3 +163,12 @@ Feita na Sprint 4, num smartphone Android:
 | Câmera e GPS difíceis de testar automaticamente | Testes frágeis | Isolar atrás de interfaces e simular com `jest.mock` |
 | Emulador do Firebase lento no CI | Pipeline demorado | Rodar integração só em pull requests para o ramo principal |
 | Um único desenvolvedor | Revisão de código fraca | Revisar o próprio pull request no dia seguinte, com checklist |
+
+## 11. Mudanças na versão 1.1 (Sprint 2)
+
+| Mudança | Motivo |
+|---|---|
+| Fotos no Firestore (coleção `fotos`, até 700 KB) em vez do Cloud Storage | O Cloud Storage passou a exigir o plano pago (Blaze) do Firebase; o projeto tem orçamento zero |
+| Testes ponta a ponta com Playwright no build web, em vez do Maestro | Não há emulador Android no ambiente de desenvolvimento; o build web roda o mesmo código e roda também no GitHub Actions |
+| Notificações dentro do app (central de avisos) em vez de push | Push pelo Cloud Messaging exigiria Cloud Functions, também só no plano pago |
+| Piloto pela versão web (link), sem instalação | Inclui moradores com iPhone e dispensa instalar arquivos; o app nativo é demonstrado com o Expo Go |
