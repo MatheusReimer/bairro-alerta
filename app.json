@@ -39,6 +39,12 @@
       ],
       "expo-font"
     ],
-    "scheme": "bairroalerta"
+    "scheme": "bairroalerta",
+    "extra": {
+      "eas": {
+        "projectId": "2d4b3135-d86a-480a-becd-3e2d04dd945d"
+      }
+    },
+    "owner": "bonhart"
   }
 }
