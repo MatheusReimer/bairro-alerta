@@ -4,470 +4,586 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bairro Alerta - Protótipo de telas</title>
+<!-- Etapa 2, estilo "widgets suaves" com a paleta "Grafite e lima". A versão da Etapa 1 está em prototipo-etapa1.html.
+     Abra este arquivo no navegador: "Navegar" percorre o fluxo clicando nas telas; "Todas as telas" mostra as oito lado a lado.
+     Atalhos na URL: #todas, #escuro, #claro e #t=<tela> (ex.: prototipo.html#todas-escuro, prototipo.html#t=detalhe). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
 <style>
-  :root {
-    --azul: #2E74B5;
-    --azul-esc: #1F4E79;
-    --azul-claro: #DEEAF6;
-    --texto: #1d2733;
-    --texto-2: #5b6776;
-    --borda: #e3e8ee;
-    --fundo: #f4f6f9;
-    --verde: #2e8b57;
-    --amarelo: #c98a00;
-    --vermelho: #c0392b;
-    --cinza: #8a96a3;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: #e9edf2;
-    color: var(--texto);
-    min-height: 100vh;
-  }
-  button { font: inherit; cursor: pointer; border: 0; background: none; color: inherit; }
-
-  /* ---------- palco ---------- */
-  .palco { display: flex; flex-direction: column; align-items: center; padding: 28px 16px 40px; gap: 18px; }
+  /* ---------------- página ---------------- */
+  :root { --pg: #DCDCD7; --pg-tx: #161616; --pg-mu: #5A5A56; --pg-bt: #FFFFFF; --pg-ln: #CFCFC9; }
+  body.pg-escura { --pg: #070707; --pg-tx: #F2F2EE; --pg-mu: #9C9C96; --pg-bt: #1C1C1C; --pg-ln: #2A2A2A; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: var(--pg); color: var(--pg-tx); font-family: Geist, system-ui, sans-serif; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: inherit; }
+  .palco { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 16px 40px; }
+  .palco h1 { margin: 0; font-family: 'Bricolage Grotesque', Geist, sans-serif; font-size: 24px; letter-spacing: -.4px; }
+  .palco > p { margin: -8px 0 0; color: var(--pg-mu); font-size: 13px; text-align: center; }
   .barra { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-  .barra button {
-    padding: 6px 12px; border-radius: 999px; background: #fff; border: 1px solid var(--borda);
-    font-size: 13px; color: var(--texto-2);
-  }
-  .barra button.ativo { background: var(--azul); border-color: var(--azul); color: #fff; }
-  .grade { display: none; flex-wrap: wrap; gap: 28px; justify-content: center; }
-  .grade .rotulo { text-align: center; font-size: 14px; font-weight: 600; color: var(--azul-esc); margin-top: 10px; }
-  body.todas .grade { display: flex; }
-  body.todas .unico { display: none; }
-  body.todas .barra { display: none; }
+  .grupo { display: flex; flex-wrap: wrap; justify-content: center; background: var(--pg-bt); border: 1px solid var(--pg-ln); border-radius: 999px; padding: 3px; }
+  .grupo button { padding: 6px 12px; border-radius: 999px; font-size: 12.5px; color: var(--pg-mu); font-weight: 500; }
+  .grupo button.ativo { background: #D4F25A; color: #161616; font-weight: 600; }
+  .unico .fone { zoom: .82; }
+  .grade { display: none; flex-wrap: wrap; gap: 26px 22px; justify-content: center; max-width: 1240px; }
+  .grade .fone { zoom: .62; }
+  body.todas .grade { display: flex; } body.todas .unico, body.todas #telas { display: none; }
+  .peca { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .rot { font-size: 12.5px; color: var(--pg-mu); font-weight: 500; }
+  .credito { font-size: 11.5px; color: var(--pg-mu); max-width: 640px; text-align: center; }
 
-  /* ---------- aparelho ---------- */
-  .aparelho {
-    width: 360px; height: 740px; background: #111; border-radius: 44px; padding: 12px;
-    box-shadow: 0 18px 40px rgba(20, 40, 70, .25);
-  }
-  .tela {
-    position: relative; width: 100%; height: 100%; background: var(--fundo);
-    border-radius: 34px; overflow: hidden; display: flex; flex-direction: column;
-  }
-  .status {
-    height: 34px; display: flex; align-items: center; justify-content: space-between;
-    padding: 0 24px; font-size: 12px; font-weight: 600; flex: none;
-  }
-  .conteudo { flex: 1; overflow-y: auto; scrollbar-width: none; }
-  .conteudo::-webkit-scrollbar { display: none; }
+  /* ---------------- aparelho (tela de 390 x 844) ---------------- */
+  .fone { width: 404px; height: 858px; border-radius: 56px; background: #050505; padding: 7px; flex: none;
+          box-shadow: 0 0 0 1px #2a2a2a, 0 26px 60px rgba(0,0,0,.3); }
+  .tela { width: 390px; height: 844px; border-radius: 49px; overflow: hidden; position: relative; display: flex; flex-direction: column;
+          /* claro (padrão) */
+          --bg: #EBEBE7; --card: #FFFFFF; --ink: #161616; --mu: #696965; --line: #E2E2DD; --borda: #D8D8D3; --trilho: #D2D2CC;
+          --chip-on: #1A1A1A; --chip-on-tx: #F2F2EE; --chip-on-ic: #D4F25A;
+          --data: #1A1A1A; --data-tx: #F2F2EE; --data-mu: #9C9C96; --data-bar: #363636; --apoio: #161616; --apoio-mu: #B5B5AE;
+          --lima: #D4F25A; --sob: #161616; --lima-tx: #4F6B00;
+          --ab-bg: #EFEFEB; --ab-tx: #4A4A46; --en-bg: #E1E9F0; --en-tx: #284B66; --an-bg: #EFF7C9; --an-tx: #4F6B00; --ok-bg: #1A1A1A; --ok-tx: #D4F25A;
+          --erro: #B42318; --erro-bg: #FCE8E6; --vidro: rgba(255,255,255,.94);
+          --nav: #161616; --nav-on: #F2F2EE; --nav-tx: #8F8F8A;
+          --m-terra: #E0E0DB; --m-parque: #D3DEC0; --m-agua: #D3DCE0; --m-rua: #F8F8F5;
+          --pin: #1A1A1A; --pin-tx: #FFFFFF; --pin2: #FFFFFF; --pin2-tx: #161616;
+          background: var(--bg); color: var(--ink); font-family: Geist, system-ui, sans-serif; font-size: 15px; line-height: 1.35; text-align: left; }
+  .tela.escuro {
+          --bg: #111111; --card: #1C1C1C; --ink: #F2F2EE; --mu: #9C9C96; --line: #2A2A2A; --borda: #343432; --trilho: #333333;
+          --chip-on: #F2F2EE; --chip-on-tx: #161616; --chip-on-ic: #4F6B00;
+          --data: #262626; --data-tx: #F2F2EE; --data-mu: #A3A39D; --data-bar: #3A3A3A; --apoio: #262626; --apoio-mu: #B5B5AE;
+          --lima-tx: #D4F25A;
+          --ab-bg: #2E2E2C; --ab-tx: #E2E2DC; --en-bg: #22303B; --en-tx: #A9C8E0; --an-bg: #2C3315; --an-tx: #D4F25A; --ok-bg: #D4F25A; --ok-tx: #161616;
+          --erro: #FF8A80; --erro-bg: #3A1D1B; --vidro: rgba(28,28,28,.94);
+          --nav: #2A2A2A; --nav-on: #F2F2EE; --nav-tx: #9C9C96;
+          --m-terra: #1F1F1E; --m-parque: #263020; --m-agua: #1D262B; --m-rua: #2E2E2C;
+          --pin: #F2F2EE; --pin-tx: #161616; --pin2: #3A3A3A; --pin2-tx: #F2F2EE; }
+  .tela * { box-sizing: border-box; margin: 0; }
+  .tela i[class*="ph"] { font-size: 20px; line-height: 1; }
+  .tit { font-family: 'Bricolage Grotesque', Geist, sans-serif; font-weight: 700; letter-spacing: -.6px; line-height: 1.05; }
+  .ft { object-fit: cover; display: block; width: 100%; height: 100%; }
+  .noite { width: 100%; height: 100%; background: #2B2B29; display: grid; place-items: center; color: #D4F25A; }
+  .m-terra { fill: var(--m-terra); } .m-parque { fill: var(--m-parque); } .m-agua { fill: var(--m-agua); } .m-rua { stroke: var(--m-rua); }
 
-  .topo { background: #fff; padding: 6px 18px 12px; border-bottom: 1px solid var(--borda); flex: none; }
-  .topo .linha { display: flex; align-items: center; gap: 10px; }
-  .topo h1 { font-size: 19px; }
-  .topo .sub { font-size: 12.5px; color: var(--texto-2); margin-top: 2px; }
-  .voltar { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--fundo); }
+  /* barra de status */
+  .sb { height: 50px; flex: none; display: flex; justify-content: space-between; align-items: center; padding: 6px 34px 0;
+        font-size: 15px; font-weight: 600; position: relative; z-index: 7; }
+  .sb .ic { display: flex; gap: 5px; align-items: center; } .sb .ic i { font-size: 15px !important; }
+  .sb.sobre-foto { color: #fff; position: absolute; left: 0; right: 0; top: 0; }
+  .ilha { position: absolute; left: 50%; top: 11px; transform: translateX(-50%); width: 120px; height: 34px; border-radius: 20px; background: #000; z-index: 8; }
 
-  .ico { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  /* peças comuns */
+  .corpo { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding: 8px 16px 0; }
+  .widget { background: var(--card); border-radius: 26px; }
+  .redondo { width: 48px; height: 48px; flex: none; border-radius: 24px; display: grid; place-items: center; background: var(--card); color: var(--ink); position: relative; }
+  .redondo.p { width: 44px; height: 44px; border-radius: 22px; }
+  .redondo i { font-size: 20px !important; }
+  .ponto-lima { position: absolute; top: 11px; right: 12px; width: 10px; height: 10px; border-radius: 5px; background: var(--lima); border: 2px solid var(--card); }
+  .cab { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 0 4px; }
+  .cab .lugar { font-size: 13px; color: var(--mu); font-weight: 500; display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+  .cab .lugar i { font-size: 14px !important; }
+  .cab h4 { font-size: 30px; letter-spacing: -.8px; }
+  .cab small { display: block; color: var(--mu); font-size: 13px; margin-top: 3px; }
+  .cab-v { display: flex; align-items: center; gap: 12px; }
+  .cab-v h4 { font-size: 26px; letter-spacing: -.6px; }
+  .cab-v small { display: block; color: var(--mu); font-size: 13px; margin-top: 2px; }
+  .pill { padding: 5px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; flex: none; }
+  .ab { background: var(--ab-bg); color: var(--ab-tx); } .en { background: var(--en-bg); color: var(--en-tx); }
+  .an { background: var(--an-bg); color: var(--an-tx); } .ok { background: var(--ok-bg); color: var(--ok-tx); }
+  .lima { background: var(--lima); color: var(--sob); }
+  .acao { display: flex; align-items: center; justify-content: center; gap: 8px; height: 56px; border-radius: 28px; font-size: 15.5px; font-weight: 600; width: 100%; }
+  .acao i { font-size: 18px !important; }
+  .acao.clara { background: var(--card); color: var(--ink); }
+  .acao.fantasma { color: var(--mu); height: 48px; font-size: 15px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips.rola { flex-wrap: nowrap; overflow: hidden; }
+  .chip { display: flex; align-items: center; gap: 6px; padding: 9px 14px; border: 1.5px solid var(--borda); border-radius: 20px; background: var(--card);
+          font-size: 14px; font-weight: 500; white-space: nowrap; flex: none; }
+  .chip.on { background: var(--chip-on); border-color: var(--chip-on); color: var(--chip-on-tx); font-weight: 600; }
+  .chip.on i { color: var(--chip-on-ic); font-size: 15px !important; }
+  .chip .n { font-size: 11.5px; font-weight: 600; background: var(--bg); color: var(--ink); border-radius: 9px; padding: 1px 6px; }
+  .chip.on .n { background: var(--card); color: var(--ink); }
 
-  /* ---------- componentes ---------- */
-  .botao {
-    display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
-    height: 48px; border-radius: 14px; background: var(--azul); color: #fff; font-weight: 600; font-size: 15px;
-  }
-  .botao.sec { background: #fff; color: var(--azul); border: 1.5px solid var(--azul); }
-  .botao.discreto { background: transparent; color: var(--texto-2); height: 40px; font-weight: 500; }
-  .campo { display: block; margin-bottom: 14px; }
-  .campo span { display: block; font-size: 12.5px; color: var(--texto-2); margin-bottom: 6px; font-weight: 600; }
-  .campo .entrada {
-    height: 46px; border-radius: 12px; background: #fff; border: 1px solid var(--borda);
-    display: flex; align-items: center; padding: 0 14px; font-size: 14.5px; color: var(--texto);
-  }
-  .campo .entrada.vazio { color: var(--cinza); }
-  .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 12px 18px 4px; }
-  .chip {
-    flex: none; padding: 7px 12px; border-radius: 999px; background: #fff; border: 1px solid var(--borda);
-    font-size: 12.5px; color: var(--texto-2);
-  }
-  .chip.ativo { background: var(--azul); color: #fff; border-color: var(--azul); }
-  .selo { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 3px 8px; border-radius: 999px; }
-  .selo::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-  .s-aberta { color: var(--vermelho); background: #fbeceb; }
-  .s-encaminhada { color: var(--amarelo); background: #fdf3dc; }
-  .s-resolvida { color: var(--verde); background: #e3f3ea; }
+  /* linha de ocorrência dentro de um widget */
+  .linhas { padding: 14px 16px 4px; display: flex; flex-direction: column; }
+  .linhas .topo-w { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .linhas h5 { font-size: 17px; letter-spacing: -.2px; }
+  .linhas .topo-w a, .linhas .topo-w span { font-size: 13px; font-weight: 500; color: var(--mu); }
+  .linha { display: flex; align-items: center; gap: 12px; padding: 10px 0; width: 100%; }
+  .linha + .linha { border-top: 1px solid var(--line); }
+  .th { width: 48px; height: 48px; border-radius: 15px; overflow: hidden; flex: none; background: var(--bg); display: grid; place-items: center; }
+  .th i { font-size: 22px !important; }
+  .linha .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .linha b { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .linha small { font-size: 12.5px; color: var(--mu); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  .cartao {
-    background: #fff; border-radius: 16px; padding: 12px; display: flex; gap: 12px;
-    border: 1px solid var(--borda); text-align: left; width: 100%;
-  }
-  .miniatura { width: 64px; height: 64px; border-radius: 12px; flex: none; }
-  .cartao h3 { font-size: 14px; line-height: 1.25; }
-  .cartao .rua { font-size: 12px; color: var(--texto-2); margin: 3px 0 6px; }
-  .cartao .rodape { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
-  .apoios { font-size: 11.5px; color: var(--texto-2); display: inline-flex; align-items: center; gap: 4px; }
-  .apoios .ico { width: 14px; height: 14px; }
-  .lista { display: flex; flex-direction: column; gap: 10px; padding: 10px 18px 96px; }
+  /* navegação flutuante */
+  .nav { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); display: flex; gap: 4px; padding: 6px; border-radius: 32px;
+         background: var(--nav); box-shadow: 0 12px 30px rgba(22,22,22,.25); z-index: 6; }
+  .nav button { width: 48px; height: 48px; border-radius: 24px; display: grid; place-items: center; color: var(--nav-tx); }
+  .nav button.on { width: auto; display: flex; align-items: center; gap: 7px; padding: 0 16px; background: var(--nav-on); color: #161616; font-size: 14px; font-weight: 600; }
+  .nav button i { font-size: 20px !important; }
 
-  /* "fotos" ilustrativas */
-  .f-buraco { background: linear-gradient(160deg, #6b6f75 0%, #4a4e54 55%, #2f3236 56%, #3a3d41 70%, #5c6066 71%); }
-  .f-luz { background: radial-gradient(circle at 70% 30%, #3b4a63 0 10%, transparent 11%), linear-gradient(180deg, #1c2638, #2c3a52); }
-  .f-entulho { background: linear-gradient(135deg, #8d7b62 0 25%, #b9ab92 25% 45%, #6f6250 45% 60%, #cfc4ad 60% 75%, #7d6f5a 75%); }
-  .f-agua { background: linear-gradient(180deg, #9fb3c4 0 40%, #6f8aa1 40% 100%); }
-  .f-calcada { background: repeating-linear-gradient(90deg, #b8b2a7 0 22px, #a39d92 22px 24px); }
+  /* mapa esquemático */
+  .mapa-w { position: relative; display: block; border-radius: 28px; overflow: hidden; flex: none; }
+  .mapa-w svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .pino { position: absolute; display: grid; place-items: center; border-radius: 50%; font-size: 12px; font-weight: 600; transform: translate(-50%, -50%); }
+  .pino.forte { width: 36px; height: 36px; background: var(--lima); color: var(--sob); font-size: 13px; box-shadow: 0 0 0 6px rgba(212,242,90,.25); }
+  .pino.medio { width: 30px; height: 30px; background: var(--pin); color: var(--pin-tx); box-shadow: 0 0 0 5px rgba(26,26,26,.16); }
+  .pino.fraco { width: 28px; height: 28px; background: var(--pin2); color: var(--pin2-tx); box-shadow: 0 0 0 5px rgba(255,255,255,.4); }
+  .tela.escuro .pino.medio { box-shadow: 0 0 0 5px rgba(242,242,238,.14); }
+  .tela.escuro .pino.fraco { box-shadow: 0 0 0 5px rgba(0,0,0,.3); }
+  .pino i { font-size: 15px !important; }
+  .mapa-w .chipm { position: absolute; left: 12px; bottom: 12px; display: flex; align-items: center; gap: 8px; padding: 7px 12px 7px 8px; border-radius: 18px;
+                   background: var(--vidro); font-size: 13px; font-weight: 600; }
+  .mapa-w .chipm span { width: 22px; height: 22px; border-radius: 11px; display: grid; place-items: center; font-size: 11px; }
+  .mapa-w .abrir { position: absolute; right: 12px; bottom: 12px; width: 36px; height: 36px; border-radius: 18px; display: grid; place-items: center; background: var(--ink); color: var(--bg); }
+  .mapa-w .abrir i { font-size: 17px !important; }
 
-  .fab {
-    position: absolute; right: 18px; bottom: 82px; height: 52px; padding: 0 18px; border-radius: 16px;
-    background: var(--azul); color: #fff; font-weight: 600; display: flex; align-items: center; gap: 8px;
-    box-shadow: 0 8px 18px rgba(46, 116, 181, .4);
-  }
-  .abas {
-    position: absolute; left: 0; right: 0; bottom: 0; height: 68px; background: #fff; border-top: 1px solid var(--borda);
-    display: flex; justify-content: space-around; align-items: center; padding-bottom: 8px;
-  }
-  .abas button { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; color: var(--cinza); }
-  .abas button.ativo { color: var(--azul); font-weight: 600; }
+  /* entrar */
+  .marca { position: absolute; left: 16px; top: 16px; display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 20px; background: var(--vidro); font-size: 13px; font-weight: 600; }
+  .marca span { width: 28px; height: 28px; border-radius: 14px; display: grid; place-items: center; }
+  .marca span i { font-size: 16px !important; }
+  .entrar h4 { font-size: 36px; letter-spacing: -1px; margin: 6px 4px 0; }
+  .entrar > p { color: var(--mu); font-size: 15px; margin: -4px 4px 0; line-height: 1.4; }
+  .form { padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+  .form label { font-size: 13px; color: var(--mu); font-weight: 500; margin-top: 4px; }
+  .campo { height: 52px; border-radius: 16px; background: var(--bg); display: flex; align-items: center; gap: 10px; padding: 0 14px; font-size: 15.5px; }
+  .campo i { color: var(--mu); font-size: 19px !important; }
+  .campo .fim { margin-left: auto; }
+  .campo.foco { box-shadow: inset 0 0 0 2px var(--ink); }
+  .rodape { text-align: center; color: var(--mu); font-size: 14px; margin-top: 2px; }
+  .rodape b { color: var(--lima-tx); font-weight: 600; }
 
-  .alternar { display: flex; background: var(--fundo); border-radius: 10px; padding: 3px; margin-top: 10px; }
-  .alternar button { flex: 1; height: 32px; border-radius: 8px; font-size: 13px; color: var(--texto-2); }
-  .alternar button.ativo { background: #fff; color: var(--texto); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  /* início */
+  .dupla { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .dados { height: 150px; padding: 16px; border-radius: 26px; background: var(--data); color: var(--data-tx); display: flex; flex-direction: column; justify-content: space-between; }
+  .dados > span { font-size: 12.5px; color: var(--data-mu); font-weight: 500; display: flex; align-items: center; gap: 6px; }
+  .dados > span i { font-size: 15px !important; }
+  .dados .num { font-family: 'Bricolage Grotesque', sans-serif; font-size: 44px; font-weight: 700; line-height: .9; letter-spacing: -1px; }
+  .dados .rodape-d { font-size: 12px; color: var(--data-mu); } .dados .rodape-d b { color: var(--lima); font-weight: 600; }
+  .avisar { height: 150px; padding: 16px; border-radius: 26px; background: var(--lima); color: var(--sob); display: flex; flex-direction: column; justify-content: space-between; text-align: left; }
+  .avisar > span:first-child, .tambem > span:first-child { width: 42px; height: 42px; border-radius: 21px; background: #161616; color: #D4F25A; display: grid; place-items: center; }
+  .avisar .tit { font-size: 20px; letter-spacing: -.3px; }
 
-  /* mapa ilustrativo */
-  .mapa { position: relative; background: #e8ece4; overflow: hidden; }
-  .mapa .rua-h, .mapa .rua-v { position: absolute; background: #fff; }
-  .mapa .rua-h { left: -10%; right: -10%; height: 14px; }
-  .mapa .rua-v { top: -10%; bottom: -10%; width: 14px; }
-  .mapa .quadra { position: absolute; background: #dfe5da; border-radius: 4px; }
-  .pino { position: absolute; transform: translate(-50%, -100%); }
-  .pino .gota {
-    width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
-    display: grid; place-items: center; box-shadow: 0 3px 6px rgba(0,0,0,.25); border: 2px solid #fff;
-  }
-  .pino .gota span { transform: rotate(45deg); color: #fff; font-size: 12px; font-weight: 700; }
-  .eu { position: absolute; width: 16px; height: 16px; border-radius: 50%; background: var(--azul); border: 3px solid #fff; box-shadow: 0 0 0 8px rgba(46,116,181,.2); transform: translate(-50%, -50%); }
+  /* nova */
+  .progresso { display: flex; align-items: center; gap: 12px; }
+  .progresso .seg { flex: 1; display: flex; gap: 5px; }
+  .progresso .seg span { flex: 1; height: 5px; border-radius: 3px; background: var(--trilho); }
+  .progresso .seg span.f { background: var(--ink); }
+  .progresso small { font-size: 12.5px; font-weight: 500; color: var(--mu); }
+  .nova h4 { font-size: 28px; letter-spacing: -.7px; margin: 2px 4px 0; }
+  .fotow { position: relative; border-radius: 26px; overflow: hidden; height: 200px; flex: none; }
+  .fotow .priv { position: absolute; left: 12px; top: 12px; display: flex; align-items: center; gap: 6px; padding: 6px 11px 6px 8px; border-radius: 16px;
+                 background: rgba(22,22,22,.72); color: #F2F2EE; font-size: 12px; font-weight: 500; }
+  .fotow .priv i { color: #D4F25A; font-size: 14px !important; }
+  .fotow .trocar { position: absolute; right: 12px; top: 12px; width: 34px; height: 34px; border-radius: 17px; display: grid; place-items: center; background: rgba(22,22,22,.72); color: #F2F2EE; }
+  .fotow .trocar i { font-size: 16px !important; }
+  .onde { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 18px; background: var(--vidro); }
+  .onde > span { width: 30px; height: 30px; flex: none; border-radius: 15px; display: grid; place-items: center; }
+  .onde > span i { font-size: 15px !important; }
+  .onde div { flex: 1; display: flex; flex-direction: column; line-height: 1.25; }
+  .onde b { font-size: 14px; font-weight: 600; } .onde small { font-size: 12px; color: var(--mu); }
+  .onde a { font-size: 13px; font-weight: 600; color: var(--lima-tx); }
+  .tipo { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .tipo > span { font-size: 14px; color: var(--mu); }
+  .desc { padding: 14px 16px; color: var(--mu); font-size: 14.5px; display: flex; align-items: center; gap: 10px; }
+  .desc i { font-size: 18px !important; }
+  .rodape-n { position: absolute; left: 16px; right: 16px; bottom: 26px; display: flex; gap: 10px; }
+  .rodape-n .acao.clara { flex: 1; } .rodape-n .acao.lima { flex: 1.3; }
 
-  .secao { padding: 14px 18px 0; }
-  .secao h2 { font-size: 13px; color: var(--texto-2); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
-  .foto-grande { height: 170px; border-radius: 16px; position: relative; overflow: hidden; }
-  .foto-grande .acao {
-    position: absolute; right: 10px; bottom: 10px; background: rgba(0,0,0,.55); color: #fff; font-size: 12px;
-    padding: 6px 10px; border-radius: 999px; display: flex; align-items: center; gap: 5px;
-  }
-  .categorias { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .cat {
-    background: #fff; border: 1.5px solid var(--borda); border-radius: 14px; padding: 10px 4px; font-size: 12px;
-    display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--texto-2);
-  }
-  .cat.ativo { border-color: var(--azul); background: var(--azul-claro); color: var(--azul-esc); font-weight: 600; }
-  .local { background: #fff; border: 1px solid var(--borda); border-radius: 14px; overflow: hidden; }
-  .local .info { padding: 10px 12px; font-size: 13px; display: flex; gap: 8px; align-items: center; }
-  .local .info small { display: block; color: var(--texto-2); font-size: 11.5px; }
-  .aviso { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: var(--texto-2); padding: 12px 18px 0; }
-  .aviso .ico { width: 16px; height: 16px; flex: none; margin-top: 1px; }
+  /* registro parecido */
+  .veu { position: absolute; inset: 0; background: rgba(10,10,10,.55); z-index: 5; }
+  .folha { position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; background: var(--card); border-radius: 32px 32px 0 0; padding: 10px 16px 30px; display: flex; flex-direction: column; }
+  .alca { width: 40px; height: 5px; border-radius: 3px; background: var(--trilho); margin: 0 auto 16px; }
+  .selo { width: 52px; height: 52px; border-radius: 26px; display: grid; place-items: center; margin-bottom: 14px; }
+  .selo i { font-size: 26px !important; }
+  .folha h5 { font-size: 24px; letter-spacing: -.5px; }
+  .folha p { color: var(--mu); font-size: 14.5px; margin-top: 8px; line-height: 1.45; }
+  .folha .caixa { background: var(--bg); border-radius: 22px; padding: 2px 14px; margin: 16px 0 14px; }
+  .folha .caixa .th { background: var(--card); }
 
-  .veu { position: absolute; inset: 0; background: rgba(15, 25, 40, .45); }
-  .folha {
-    position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 24px 24px 0 0; padding: 10px 18px 26px;
-  }
-  .folha .puxador { width: 40px; height: 5px; border-radius: 3px; background: var(--borda); margin: 0 auto 14px; }
-  .folha h2 { font-size: 18px; margin-bottom: 4px; }
-  .folha p { font-size: 13.5px; color: var(--texto-2); margin-bottom: 14px; line-height: 1.4; }
+  /* detalhe */
+  .heroi { position: relative; height: 330px; flex: none; border-radius: 0 0 34px 34px; overflow: hidden; }
+  .heroi::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(22,22,22,.35) 0%, rgba(22,22,22,0) 30%, rgba(22,22,22,0) 50%, rgba(22,22,22,.82) 100%); }
+  .heroi .voltar { position: absolute; left: 16px; top: 54px; width: 44px; height: 44px; border-radius: 22px; display: grid; place-items: center; background: rgba(255,255,255,.92); color: #161616; z-index: 1; }
+  .heroi .voltar i { font-size: 19px !important; }
+  .heroi .pill { position: absolute; right: 16px; top: 61px; font-size: 12.5px; padding: 6px 12px; border-radius: 15px; z-index: 1; }
+  .heroi .base { position: absolute; left: 20px; right: 20px; bottom: 20px; color: #fff; display: flex; flex-direction: column; gap: 4px; z-index: 1; }
+  .heroi .base span { font-size: 12.5px; opacity: .88; }
+  .heroi h4 { font-size: 27px; letter-spacing: -.6px; }
+  .detalhe { padding: 12px 16px 0; display: flex; flex-direction: column; gap: 12px; }
+  .apoios { height: 112px; padding: 14px 16px; border-radius: 24px; background: var(--apoio); display: flex; flex-direction: column; justify-content: space-between; }
+  .avs { display: flex; } .avs span { width: 26px; height: 26px; border-radius: 13px; border: 2px solid var(--apoio); }
+  .avs span + span { margin-left: -8px; }
+  .apoios .num { font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 700; line-height: 1; color: #D4F25A; }
+  .apoios small { font-size: 13px; color: var(--apoio-mu); }
+  .tambem { height: 112px; padding: 14px 16px; border-radius: 24px; background: var(--lima); color: var(--sob); display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; }
+  .tambem > span:first-child { width: 36px; height: 36px; border-radius: 18px; }
+  .tambem > span:first-child i { font-size: 17px !important; }
+  .tambem .tit { font-size: 19px; }
+  .andamento { padding: 16px; display: flex; flex-direction: column; }
+  .andamento .topo-a { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .andamento h5 { font-size: 17px; } .andamento .topo-a small { font-size: 12.5px; color: var(--mu); }
+  .andamento .seg { display: flex; gap: 5px; margin-bottom: 14px; }
+  .andamento .seg span { flex: 1; height: 5px; border-radius: 3px; background: var(--trilho); }
+  .andamento .seg span.f { background: var(--ink); }
+  .evento { display: flex; gap: 12px; }
+  .evento .eixo { display: flex; flex-direction: column; align-items: center; }
+  .evento .eixo span:first-child { width: 14px; height: 14px; border-radius: 7px; background: var(--ink); margin-top: 3px; }
+  .evento.agora .eixo span:first-child { background: var(--lima); box-shadow: 0 0 0 4px rgba(212,242,90,.28); }
+  .evento .eixo span + span { width: 2px; flex: 1; background: var(--line); margin: 4px 0; }
+  .evento > div:last-child { display: flex; flex-direction: column; padding-bottom: 12px; }
+  .evento b { font-size: 14.5px; font-weight: 600; } .evento small { font-size: 12.5px; color: var(--mu); }
 
-  .linha-tempo { list-style: none; padding: 4px 0 0; }
-  .linha-tempo li { position: relative; padding: 0 0 16px 28px; font-size: 13.5px; }
-  .linha-tempo li::before {
-    content: ""; position: absolute; left: 5px; top: 3px; width: 12px; height: 12px; border-radius: 50%;
-    background: #fff; border: 2.5px solid var(--borda);
-  }
-  .linha-tempo li::after { content: ""; position: absolute; left: 10px; top: 17px; bottom: 0; width: 2px; background: var(--borda); }
-  .linha-tempo li:last-child::after { display: none; }
-  .linha-tempo li.feito::before { background: var(--azul); border-color: var(--azul); }
-  .linha-tempo li.feito::after { background: var(--azul); }
-  .linha-tempo small { display: block; color: var(--texto-2); font-size: 12px; margin-top: 2px; }
+  /* moderação */
+  .mod { padding: 4px 14px 14px; }
+  .mod .acoes { display: flex; gap: 8px; margin-top: 2px; }
+  .mod .acoes button { height: 44px; border-radius: 22px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 14px; font-weight: 600; flex: 1; }
+  .mod .acoes i { font-size: 16px !important; }
+  .mod .acoes .neutro { background: var(--bg); color: var(--ink); }
+  .mod .acoes .icone { flex: none; width: 44px; background: var(--bg); color: var(--ink); }
+  .mod .acoes .perigo { background: var(--erro-bg); color: var(--erro); }
+  .denuncia { display: flex; align-items: center; gap: 6px; color: var(--erro); font-size: 12.5px; font-weight: 600; margin-top: 2px; }
+  .denuncia i { font-size: 14px !important; }
 
-  .contador { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid var(--borda); border-radius: 14px; padding: 12px 14px; }
-  .contador strong { font-size: 22px; color: var(--azul); }
-  .contador span { font-size: 12.5px; color: var(--texto-2); }
-
-  .mod-cartao { background: #fff; border: 1px solid var(--borda); border-radius: 16px; padding: 12px; }
-  .mod-cartao .topo-c { display: flex; gap: 10px; }
-  .mod-cartao .acoes { display: flex; gap: 6px; margin-top: 10px; }
-  .mod-cartao .acoes button { flex: 1; height: 34px; border-radius: 10px; font-size: 12px; font-weight: 600; border: 1px solid var(--borda); background: var(--fundo); color: var(--texto-2); }
-  .mod-cartao .acoes .enc { background: #fdf3dc; color: var(--amarelo); border-color: #f5e2b0; }
-  .mod-cartao .acoes .res { background: #e3f3ea; color: var(--verde); border-color: #c6e6d3; }
-  .mod-cartao .acoes .ocu { background: #fbeceb; color: var(--vermelho); border-color: #f2cfcb; }
-  .denuncia { font-size: 11.5px; color: var(--vermelho); margin-top: 6px; }
+  /* avisos */
+  .grupo-a { font-size: 13px; color: var(--mu); font-weight: 600; padding: 6px 6px 0; }
+  .avisos-w { padding: 4px 16px; }
+  .aviso { display: flex; gap: 12px; padding: 12px 0; align-items: flex-start; }
+  .aviso + .aviso { border-top: 1px solid var(--line); }
+  .aviso .ic { width: 40px; height: 40px; border-radius: 20px; display: grid; place-items: center; flex: none; background: var(--bg); }
+  .aviso .ic i { font-size: 19px !important; }
+  .aviso.novo .ic { background: var(--lima); color: var(--sob); }
+  .aviso p { font-size: 14px; color: var(--mu); line-height: 1.4; } .aviso p b { color: var(--ink); font-weight: 600; }
+  .aviso.novo p b { font-weight: 700; }
+  .aviso small { color: var(--mu); font-size: 12px; display: block; margin-top: 4px; }
 </style>
 </head>
 <body>
 
-<svg width="0" height="0" style="position:absolute">
-  <symbol id="i-voltar" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
-  <symbol id="i-mais" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
-  <symbol id="i-pino" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
-  <symbol id="i-mao" viewBox="0 0 24 24"><path d="M7 11V5.5a1.5 1.5 0 013 0V10m0-1.5V4a1.5 1.5 0 013 0v6m0-4.5a1.5 1.5 0 013 0V11m0-3a1.5 1.5 0 013 0v6a7 7 0 01-7 7h-1a6 6 0 01-5-2.7L4 14.5a1.6 1.6 0 012.6-1.8L8 14"/></symbol>
-  <symbol id="i-casa" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9H4z"/></symbol>
-  <symbol id="i-lista" viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></symbol>
-  <symbol id="i-sino" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0112 0v5l2 2H4z"/><path d="M10 20a2 2 0 004 0"/></symbol>
-  <symbol id="i-pessoa" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></symbol>
-  <symbol id="i-escudo" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></symbol>
-  <symbol id="i-cadeado" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></symbol>
-  <symbol id="i-buraco" viewBox="0 0 24 24"><ellipse cx="12" cy="14" rx="8" ry="4"/><path d="M7 13c2 1.5 8 1.5 10 0"/></symbol>
-  <symbol id="i-luz" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 00-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0012 3z"/></symbol>
-  <symbol id="i-entulho" viewBox="0 0 24 24"><path d="M3 20h18M5 20l3-7 4 3 3-6 4 10"/></symbol>
-  <symbol id="i-calcada" viewBox="0 0 24 24"><path d="M3 17h18M3 13h18M8 13v4M14 13v4M11 17v4"/></symbol>
-  <symbol id="i-agua" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/></symbol>
-  <symbol id="i-outros" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="18" cy="12" r="1.5"/></symbol>
-  <symbol id="i-olho" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 6.1A9.8 9.8 0 0112 6c5 0 9 6 9 6a17 17 0 01-3 3.5M6.5 7.5C4.3 9.1 3 12 3 12s4 6 9 6c1.4 0 2.7-.4 3.8-1"/></symbol>
-</svg>
-
 <div class="palco">
-  <nav class="barra" id="barra"></nav>
-  <div class="unico"><div class="aparelho"><div class="tela" id="tela"></div></div></div>
+  <h1>Bairro Alerta · Protótipo de telas</h1>
+  <p>Etapa 2 · widgets suaves, paleta Grafite e lima. Clique nas telas para navegar pelo fluxo.</p>
+  <div class="barra">
+    <div class="grupo" id="modo"><button class="ativo" data-modo="navegar">Navegar</button><button data-modo="todas">Todas as telas</button></div>
+    <div class="grupo" id="tema"><button class="ativo" data-tema="claro">Claro</button><button data-tema="escuro">Escuro</button></div>
+  </div>
+  <div class="barra"><div class="grupo" id="telas"></div></div>
+  <div class="unico"><div class="fone"><div class="tela" id="tela"></div></div></div>
   <div class="grade" id="grade"></div>
+  <p class="credito">Fotos: casos noticiados no bairro Vila Nova, Blumenau (Figura 1 do relatório da Etapa 1), recortadas e usadas apenas como ilustração. Nomes, números e endereços são fictícios.</p>
 </div>
 
+<!-- ======= peças reaproveitadas ======= -->
+<template id="p-sb"><div class="ilha"></div><div class="sb"><span>9:41</span><span class="ic"><i class="ph-fill ph-cell-signal-full"></i><i class="ph-fill ph-wifi-high"></i><i class="ph-fill ph-battery-full"></i></span></div></template>
+<template id="p-ruas"><svg viewBox="0 0 358 190" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <rect class="m-terra" width="358" height="190"/>
+  <path class="m-agua" d="M250 120 q 50 -24 120 6 v 70 h -120 z"/>
+  <rect class="m-parque" x="160" y="58" width="52" height="36" rx="10"/>
+  <path class="m-rua" d="M-10 128 C 80 100, 160 158, 368 110" stroke-width="15" fill="none"/>
+  <path class="m-rua" d="M118 -10 L 146 200" stroke-width="11"/>
+  <path class="m-rua" d="M248 -10 L 228 200" stroke-width="9"/>
+  <path class="m-rua" d="M-10 46 L 368 30" stroke-width="7"/>
+</svg></template>
+<template id="p-nav"><nav class="nav" aria-label="Navegação principal">
+  <button data-ir="inicio" data-tab="inicio" aria-label="Início"><i class="ph-bold ph-house"></i><span hidden>Início</span></button>
+  <button data-ir="lista" data-tab="lista" aria-label="Lista"><i class="ph-bold ph-list-bullets"></i><span hidden>Lista</span></button>
+  <button data-ir="moderacao" data-tab="moderacao" aria-label="Moderação"><i class="ph-bold ph-shield-check"></i><span hidden>Moderação</span></button>
+  <button data-ir="entrar" aria-label="Sair"><i class="ph-bold ph-sign-out"></i></button>
+</nav></template>
+
+<!-- ======= 1. entrar ======= -->
 <template id="t-entrar">
-  <div class="status"><span>9:41</span><span>●●● ▮</span></div>
-  <div class="conteudo" style="padding: 40px 26px 20px; display:flex; flex-direction:column;">
-    <div style="width:64px;height:64px;border-radius:18px;background:var(--azul);display:grid;place-items:center;color:#fff;margin-bottom:18px">
-      <svg class="ico" style="width:34px;height:34px"><use href="#i-pino"/></svg>
+  <slot data-p="sb"></slot>
+  <div class="corpo entrar">
+    <div class="mapa-w" style="height: 250px" data-p="ruas">
+      <span class="marca"><span class="lima"><i class="ph-fill ph-map-pin"></i></span>Vila Nova, Blumenau</span>
+      <span class="pino forte" style="left: 38%; top: 46%"><i class="ph-bold ph-footprints"></i></span>
+      <span class="pino medio" style="left: 70%; top: 66%"><i class="ph-bold ph-waves"></i></span>
+      <span class="pino fraco" style="left: 20%; top: 76%"><i class="ph-bold ph-lightbulb-filament"></i></span>
+      <span class="pino medio" style="left: 84%; top: 28%"><i class="ph-bold ph-traffic-cone"></i></span>
     </div>
-    <h1 style="font-size:28px;color:var(--azul-esc)">Bairro Alerta</h1>
-    <p style="color:var(--texto-2);font-size:14.5px;margin:6px 0 32px;line-height:1.4">Registre e acompanhe os problemas do seu bairro.</p>
-    <label class="campo"><span>E-mail</span><div class="entrada">ana.souza@email.com</div></label>
-    <label class="campo"><span>Senha</span><div class="entrada">••••••••</div></label>
-    <button class="botao" data-ir="inicio" style="margin-top:8px">Entrar</button>
-    <button class="botao discreto" style="margin-top:6px">Esqueci minha senha</button>
-    <div style="flex:1"></div>
-    <p style="text-align:center;font-size:13.5px;color:var(--texto-2)">Ainda não tem conta? <b style="color:var(--azul)">Criar conta</b></p>
+    <h4 class="tit">Bairro Alerta</h4>
+    <p>Registre e acompanhe os problemas do seu bairro, junto com os vizinhos.</p>
+    <div class="widget form">
+      <label>E-mail</label>
+      <div class="campo foco"><i class="ph-bold ph-envelope-simple"></i>ana.souza@email.com</div>
+      <label>Senha</label>
+      <div class="campo"><i class="ph-bold ph-lock-simple"></i>••••••••••<i class="ph-bold ph-eye fim"></i></div>
+    </div>
+    <button class="acao lima" data-ir="inicio">Entrar<i class="ph-bold ph-arrow-right"></i></button>
+    <div class="rodape">Ainda não tem conta? <b>Criar conta</b></div>
   </div>
 </template>
 
+<!-- ======= 2. início ======= -->
 <template id="t-inicio">
-  <div class="status"><span>9:41</span><span>●●● ▮</span></div>
-  <div class="topo">
-    <div class="linha" style="justify-content:space-between">
-      <div><h1>Vila Nova</h1><div class="sub">Blumenau · 24 ocorrências abertas</div></div>
-      <button class="voltar"><svg class="ico"><use href="#i-sino"/></svg></button>
+  <slot data-p="sb"></slot>
+  <div class="corpo">
+    <div class="cab">
+      <div><span class="lugar"><i class="ph-bold ph-map-pin"></i>Vila Nova, Blumenau</span><h4 class="tit">Bom dia, Ana</h4></div>
+      <button class="redondo" data-ir="avisos" aria-label="Avisos, 2 novos"><i class="ph-bold ph-bell"></i><span class="ponto-lima"></span></button>
     </div>
-    <div class="alternar"><button class="ativo" data-modo="lista">Lista</button><button data-modo="mapa">Mapa</button></div>
-  </div>
-  <div class="conteudo" style="position:relative">
-    <div class="chips">
-      <span class="chip ativo">Todas</span><span class="chip">Buraco</span><span class="chip">Iluminação</span>
-      <span class="chip">Entulho</span><span class="chip">Calçada</span><span class="chip">Alagamento</span>
-    </div>
-    <div class="vista-lista lista">
-      <button class="cartao" data-ir="detalhe">
-        <div class="miniatura f-buraco"></div>
-        <div style="flex:1"><h3>Buraco grande na pista</h3><div class="rua">Rua Theodoro Holtrup · 120 m</div>
-          <div class="rodape"><span class="selo s-encaminhada">Encaminhada</span><span class="apoios"><svg class="ico"><use href="#i-mao"/></svg>12 apoios</span></div></div>
-      </button>
-      <button class="cartao">
-        <div class="miniatura f-luz"></div>
-        <div style="flex:1"><h3>Poste apagado há uma semana</h3><div class="rua">Rua Felipe Camarão · 300 m</div>
-          <div class="rodape"><span class="selo s-aberta">Aberta</span><span class="apoios"><svg class="ico"><use href="#i-mao"/></svg>5 apoios</span></div></div>
-      </button>
-      <button class="cartao">
-        <div class="miniatura f-agua"></div>
-        <div style="flex:1"><h3>Boca de lobo entupida, alaga com chuva</h3><div class="rua">Rua Almirante Barroso · 450 m</div>
-          <div class="rodape"><span class="selo s-aberta">Aberta</span><span class="apoios"><svg class="ico"><use href="#i-mao"/></svg>9 apoios</span></div></div>
-      </button>
-      <button class="cartao">
-        <div class="miniatura f-entulho"></div>
-        <div style="flex:1"><h3>Entulho em terreno baldio</h3><div class="rua">Rua Gustav Salinger · 600 m</div>
-          <div class="rodape"><span class="selo s-resolvida">Resolvida</span><span class="apoios"><svg class="ico"><use href="#i-mao"/></svg>7 apoios</span></div></div>
-      </button>
-      <button class="cartao">
-        <div class="miniatura f-calcada"></div>
-        <div style="flex:1"><h3>Calçada quebrada perto da escola</h3><div class="rua">Rua Felipe Camarão · 750 m</div>
-          <div class="rodape"><span class="selo s-aberta">Aberta</span><span class="apoios"><svg class="ico"><use href="#i-mao"/></svg>3 apoios</span></div></div>
-      </button>
-    </div>
-    <div class="vista-mapa mapa" style="display:none;height:540px">
-      <div class="quadra" style="left:4%;top:4%;width:38%;height:20%"></div><div class="quadra" style="left:52%;top:4%;width:44%;height:20%"></div>
-      <div class="quadra" style="left:4%;top:32%;width:38%;height:26%"></div><div class="quadra" style="left:52%;top:32%;width:44%;height:26%"></div>
-      <div class="quadra" style="left:4%;top:66%;width:38%;height:30%"></div><div class="quadra" style="left:52%;top:66%;width:44%;height:30%"></div>
-      <div class="rua-h" style="top:26%"></div><div class="rua-h" style="top:60%"></div><div class="rua-v" style="left:45%"></div>
-      <div class="pino" style="left:30%;top:27%"><div class="gota" style="background:var(--amarelo)"><span>12</span></div></div>
-      <div class="pino" style="left:70%;top:46%"><div class="gota" style="background:var(--vermelho)"><span>5</span></div></div>
-      <div class="pino" style="left:46%;top:62%"><div class="gota" style="background:var(--vermelho)"><span>9</span></div></div>
-      <div class="pino" style="left:20%;top:80%"><div class="gota" style="background:var(--verde)"><span>7</span></div></div>
-      <div class="eu" style="left:58%;top:30%"></div>
-    </div>
-    <button class="fab" data-ir="nova"><svg class="ico"><use href="#i-mais"/></svg>Registrar</button>
-  </div>
-  <nav class="abas">
-    <button class="ativo"><svg class="ico"><use href="#i-casa"/></svg>Início</button>
-    <button><svg class="ico"><use href="#i-lista"/></svg>Meus registros</button>
-    <button data-ir="moderacao"><svg class="ico"><use href="#i-escudo"/></svg>Moderação</button>
-    <button><svg class="ico"><use href="#i-pessoa"/></svg>Perfil</button>
-  </nav>
-</template>
-
-<template id="t-nova">
-  <div class="status"><span>9:41</span><span>●●● ▮</span></div>
-  <div class="topo"><div class="linha"><button class="voltar" data-ir="inicio"><svg class="ico"><use href="#i-voltar"/></svg></button><h1>Nova ocorrência</h1></div></div>
-  <div class="conteudo" style="padding-bottom:20px">
-    <div class="secao"><h2>Foto</h2>
-      <div class="foto-grande f-buraco"><span class="acao"><svg class="ico" style="width:14px;height:14px"><use href="#i-camera"/></svg>Tirar outra</span></div>
-    </div>
-    <div class="secao"><h2>Categoria</h2>
-      <div class="categorias">
-        <div class="cat ativo"><svg class="ico"><use href="#i-buraco"/></svg>Buraco</div>
-        <div class="cat"><svg class="ico"><use href="#i-luz"/></svg>Iluminação</div>
-        <div class="cat"><svg class="ico"><use href="#i-entulho"/></svg>Entulho</div>
-        <div class="cat"><svg class="ico"><use href="#i-calcada"/></svg>Calçada</div>
-        <div class="cat"><svg class="ico"><use href="#i-agua"/></svg>Alagamento</div>
-        <div class="cat"><svg class="ico"><use href="#i-outros"/></svg>Outros</div>
-      </div>
-    </div>
-    <div class="secao"><h2>Local</h2>
-      <div class="local">
-        <div class="mapa" style="height:90px">
-          <div class="rua-h" style="top:45%"></div><div class="rua-v" style="left:62%"></div>
-          <div class="quadra" style="left:4%;top:6%;width:54%;height:32%"></div><div class="quadra" style="left:4%;top:66%;width:54%;height:30%"></div>
-          <div class="pino" style="left:40%;top:52%"><div class="gota" style="background:var(--azul);width:24px;height:24px"></div></div>
+    <button class="mapa-w" style="height: 190px" data-ir="lista" aria-label="Abrir mapa do bairro" data-p="ruas">
+      <span class="pino forte" style="left: 39%; top: 46%">12</span>
+      <span class="pino medio" style="left: 68%; top: 67%">9</span>
+      <span class="pino fraco" style="left: 19%; top: 19%">5</span>
+      <span class="chipm"><span class="lima">24</span>abertas por perto</span>
+      <span class="abrir"><i class="ph-bold ph-arrow-up-right"></i></span>
+    </button>
+    <div class="dupla">
+      <div class="dados">
+        <span><i class="ph-bold ph-check-circle"></i>Resolvidas no mês</span>
+        <div style="display: flex; align-items: flex-end; justify-content: space-between">
+          <span class="num">8</span>
+          <svg width="74" height="44" viewBox="0 0 74 44" aria-hidden="true">
+            <rect x="0" y="28" width="10" height="16" rx="3" fill="var(--data-bar)"/><rect x="16" y="20" width="10" height="24" rx="3" fill="var(--data-bar)"/>
+            <rect x="32" y="24" width="10" height="20" rx="3" fill="var(--data-bar)"/><rect x="48" y="12" width="10" height="32" rx="3" fill="var(--data-bar)"/>
+            <rect x="64" y="2" width="10" height="42" rx="3" fill="#D4F25A"/>
+          </svg>
         </div>
-        <div class="info"><svg class="ico" style="color:var(--azul)"><use href="#i-pino"/></svg><div>Rua Theodoro Holtrup, 120<small>Obtido pelo GPS · precisão de 8 m</small></div></div>
+        <span class="rodape-d"><b>+3</b> em relação a outubro</span>
+      </div>
+      <button class="avisar" data-ir="nova"><span><i class="ph-bold ph-plus"></i></span><span class="tit">Registrar problema</span></button>
+    </div>
+    <div class="widget linhas">
+      <div class="topo-w"><h5 class="tit">Perto de você</h5><button data-ir="lista" style="font-size: 13px; font-weight: 500; color: var(--mu)">Ver todas</button></div>
+      <button class="linha" data-ir="detalhe"><span class="th"><img class="ft" src="fotos/calcada.jpg" alt=""></span>
+        <span class="tx"><b>Calçada cedendo</b><small>120 m · 12 apoios</small></span><span class="pill en">Prefeitura</span></button>
+      <button class="linha"><span class="th"><img class="ft" src="fotos/alagamento.jpg" alt=""></span>
+        <span class="tx"><b>Alagamento</b><small>450 m · 9 apoios</small></span><span class="pill an">Em obra</span></button>
+    </div>
+  </div>
+  <slot data-p="nav" data-on="inicio"></slot>
+</template>
+
+<!-- ======= 3. lista ======= -->
+<template id="t-lista">
+  <slot data-p="sb"></slot>
+  <div class="corpo">
+    <div class="cab-v">
+      <button class="redondo p" data-ir="inicio" aria-label="Voltar"><i class="ph-bold ph-caret-left"></i></button>
+      <div><h4 class="tit">Ocorrências</h4><small>Vila Nova · 24 abertas · 8 resolvidas</small></div>
+    </div>
+    <div class="widget" style="padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 13px; color: var(--mu)">Tipo</span>
+      <div class="chips rola">
+        <span class="chip on"><i class="ph-bold ph-check"></i>Todas</span><span class="chip">Buraco</span><span class="chip">Iluminação</span><span class="chip">Alagamento</span>
+      </div>
+      <span style="font-size: 13px; color: var(--mu)">Situação</span>
+      <div class="chips rola">
+        <span class="chip">Aberta</span><span class="chip on"><i class="ph-bold ph-check"></i>Na prefeitura</span><span class="chip">Em andamento</span>
       </div>
     </div>
-    <div class="secao"><h2>Descrição (opcional)</h2>
-      <div class="campo" style="margin:0"><div class="entrada vazio" style="height:64px;align-items:flex-start;padding-top:12px">Ex.: buraco perto da faixa de pedestres</div></div>
+    <div class="widget linhas">
+      <div class="topo-w"><h5 class="tit">Mais apoiadas</h5><span>4 registros</span></div>
+      <button class="linha" data-ir="detalhe"><span class="th"><img class="ft" src="fotos/calcada.jpg" alt=""></span>
+        <span class="tx"><b>Calçada cedendo perto da escola</b><small>R. Theodoro Holtrup · 12 apoios</small></span><span class="pill en">Prefeitura</span></button>
+      <button class="linha"><span class="th"><img class="ft" src="fotos/alagamento.jpg" alt=""></span>
+        <span class="tx"><b>Alaga a cada chuva forte</b><small>R. Almirante Barroso · 9 apoios</small></span><span class="pill an">Em obra</span></button>
+      <button class="linha"><span class="th"><span class="noite"><i class="ph-bold ph-lightbulb-filament"></i></span></span>
+        <span class="tx"><b>Poste apagado há uma semana</b><small>R. Felipe Camarão · 5 apoios</small></span><span class="pill ab">Aberta</span></button>
+      <button class="linha"><span class="th"><img class="ft" src="fotos/entulho.jpg" alt=""></span>
+        <span class="tx"><b>Entulho no terreno baldio</b><small>R. Gustav Salinger · 4 apoios</small></span><span class="pill ok">Resolvida</span></button>
     </div>
-    <div class="aviso"><svg class="ico"><use href="#i-cadeado"/></svg>Seu nome não aparece para os outros moradores, e a localização gravada na foto é apagada antes do envio.</div>
-    <div style="padding:16px 18px 0"><button class="botao" data-ir="duplicado">Enviar</button></div>
+  </div>
+  <slot data-p="nav" data-on="lista"></slot>
+</template>
+
+<!-- ======= 4. nova ======= -->
+<template id="t-nova">
+  <slot data-p="sb"></slot>
+  <div class="corpo nova" style="gap: 14px">
+    <div class="progresso">
+      <button class="redondo p" data-ir="inicio" aria-label="Fechar"><i class="ph-bold ph-x"></i></button>
+      <div class="seg"><span class="f"></span><span class="f"></span><span></span></div>
+      <small>2 de 3</small>
+    </div>
+    <h4 class="tit">O que você<br>encontrou?</h4>
+    <div class="fotow">
+      <img class="ft" src="fotos/calcada.jpg" alt="Sua foto da calçada">
+      <span class="priv"><i class="ph-bold ph-check"></i>Dados de localização removidos</span>
+      <span class="trocar" aria-label="Trocar foto"><i class="ph-bold ph-camera-rotate"></i></span>
+      <div class="onde"><span class="lima"><i class="ph-fill ph-map-pin"></i></span>
+        <div><b>R. Theodoro Holtrup, 120</b><small>pelo GPS, ± 8 m</small></div><a>Ajustar</a></div>
+    </div>
+    <div class="widget tipo">
+      <span>Escolha o tipo</span>
+      <div class="chips">
+        <span class="chip on"><i class="ph-bold ph-check"></i>Calçada</span><span class="chip">Buraco</span><span class="chip">Iluminação</span>
+        <span class="chip">Entulho</span><span class="chip">Alagamento</span><span class="chip">Outros</span>
+      </div>
+    </div>
+    <div class="widget desc"><i class="ph-bold ph-note-pencil"></i>Descreva o problema (opcional)</div>
+  </div>
+  <div class="rodape-n">
+    <button class="acao clara" data-ir="inicio">Cancelar</button>
+    <button class="acao lima" data-ir="duplicado">Enviar<i class="ph-bold ph-arrow-right"></i></button>
   </div>
 </template>
 
+<!-- ======= 5. registro parecido ======= -->
 <template id="t-duplicado">
-  <div class="status"><span>9:41</span><span>●●● ▮</span></div>
-  <div class="topo"><div class="linha"><button class="voltar"><svg class="ico"><use href="#i-voltar"/></svg></button><h1>Nova ocorrência</h1></div></div>
-  <div class="conteudo">
-    <div class="secao"><div class="foto-grande f-buraco"></div></div>
-    <div class="secao"><div class="categorias"><div class="cat ativo"><svg class="ico"><use href="#i-buraco"/></svg>Buraco</div></div></div>
+  <slot data-p="sb"></slot>
+  <div class="corpo nova" style="gap: 14px">
+    <div class="progresso"><span class="redondo p"><i class="ph-bold ph-x"></i></span><div class="seg"><span class="f"></span><span class="f"></span><span class="f"></span></div><small>3 de 3</small></div>
+    <h4 class="tit">O que você<br>encontrou?</h4>
+    <div class="fotow"><img class="ft" src="fotos/calcada.jpg" alt=""></div>
   </div>
   <div class="veu"></div>
   <div class="folha">
-    <div class="puxador"></div>
-    <h2>Já existe um registro parecido aqui</h2>
-    <p>Um vizinho registrou um buraco a 30 m deste local. Apoiar o registro existente dá mais força à demanda do que criar outro.</p>
-    <button class="cartao" style="margin-bottom:14px" data-ir="detalhe">
-      <div class="miniatura f-buraco"></div>
-      <div style="flex:1"><h3>Buraco grande na pista</h3><div class="rua">Rua Theodoro Holtrup · a 30 m</div>
-        <div class="rodape"><span class="selo s-encaminhada">Encaminhada</span><span class="apoios"><svg class="ico"><use href="#i-mao"/></svg>12 apoios</span></div></div>
-    </button>
-    <button class="botao" data-ir="detalhe"><svg class="ico"><use href="#i-mao"/></svg>Apoiar este registro</button>
-    <button class="botao discreto" data-ir="inicio" style="margin-top:6px">É outro problema, criar novo</button>
+    <div class="alca"></div>
+    <span class="selo lima"><i class="ph-bold ph-users-three"></i></span>
+    <h5 class="tit">Já existe um registro parecido aqui</h5>
+    <p>Fica a 30 m de você. Apoiar o registro que já existe mostra à prefeitura que mais gente é afetada, sem duplicar o problema.</p>
+    <div class="caixa">
+      <button class="linha" data-ir="detalhe"><span class="th"><img class="ft" src="fotos/calcada.jpg" alt=""></span>
+        <span class="tx"><b>Calçada cedendo perto da escola</b><small>a 30 m · 12 apoios</small></span><span class="pill en">Prefeitura</span></button>
+    </div>
+    <button class="acao lima" data-ir="detalhe"><i class="ph-bold ph-arrow-fat-up"></i>Apoiar esta</button>
+    <button class="acao fantasma" data-ir="inicio">Criar nova mesmo assim</button>
   </div>
 </template>
 
+<!-- ======= 6. detalhe ======= -->
 <template id="t-detalhe">
-  <div class="status"><span>9:41</span><span>●●● ▮</span></div>
-  <div class="topo"><div class="linha"><button class="voltar" data-ir="inicio"><svg class="ico"><use href="#i-voltar"/></svg></button><h1>Ocorrência</h1></div></div>
-  <div class="conteudo" style="padding-bottom:20px">
-    <div class="secao"><div class="foto-grande f-buraco"></div></div>
-    <div class="secao">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-        <h1 style="font-size:18px">Buraco grande na pista</h1><span class="selo s-encaminhada">Encaminhada</span>
+  <div class="heroi">
+    <img class="ft" src="fotos/calcada.jpg" alt="Calçada cedendo perto da escola">
+    <button class="voltar" data-ir="inicio" aria-label="Voltar"><i class="ph-bold ph-caret-left"></i></button>
+    <span class="pill en">Na prefeitura</span>
+    <div class="base"><span>Calçada · R. Theodoro Holtrup · 120 m</span><h4 class="tit">Calçada cedendo perto da escola</h4></div>
+  </div>
+  <slot data-p="sb" data-foto></slot>
+  <div class="detalhe">
+    <div class="dupla">
+      <div class="apoios">
+        <div class="avs"><span style="background: #D4F25A"></span><span style="background: #4A4A46"></span><span style="background: #8F8F8A"></span></div>
+        <div style="display: flex; align-items: baseline; gap: 6px"><span class="num">12</span><small>vizinhos apoiam</small></div>
       </div>
-      <p style="font-size:13px;color:var(--texto-2);margin-top:4px">Buraco · Rua Theodoro Holtrup, 120</p>
+      <button class="tambem"><span><i class="ph-bold ph-plus"></i></span><span class="tit">Também vi isso</span></button>
     </div>
-    <div class="secao"><div class="contador"><div><strong>13</strong> <span>moradores viram este problema</span></div></div></div>
-    <div class="secao"><h2>Andamento</h2>
-      <ul class="linha-tempo">
-        <li class="feito">Registrada<small>12 out · por um morador</small></li>
-        <li class="feito">Encaminhada à prefeitura<small>15 out · pela associação de moradores</small></li>
-        <li>Resolvida<small>Você será avisado quando isso acontecer</small></li>
-      </ul>
+    <div class="widget andamento">
+      <div class="topo-a"><h5 class="tit">Andamento</h5><small>etapa 2 de 4</small></div>
+      <div class="seg"><span class="f"></span><span class="f"></span><span></span><span></span></div>
+      <div class="evento agora"><div class="eixo"><span></span><span></span></div><div><b>Enviado à Prefeitura</b><small>3 nov · protocolo 2026/4471</small></div></div>
+      <div class="evento"><div class="eixo"><span></span></div><div style="padding-bottom: 0"><b>Registrado por um morador</b><small>28 out</small></div></div>
     </div>
-    <div style="padding:6px 18px 0">
-      <button class="botao sec"><svg class="ico"><use href="#i-mao"/></svg>Você apoiou este registro</button>
-    </div>
-    <div class="aviso"><svg class="ico"><use href="#i-sino"/></svg>Você e os outros apoiadores recebem uma notificação sempre que o status mudar.</div>
   </div>
 </template>
 
+<!-- ======= 7. moderação ======= -->
 <template id="t-moderacao">
-  <div class="status"><span>9:41</span><span>●●● ▮</span></div>
-  <div class="topo">
-    <div class="linha"><button class="voltar" data-ir="inicio"><svg class="ico"><use href="#i-voltar"/></svg></button>
-      <div><h1>Moderação</h1><div class="sub">Associação de Moradores · 6 aguardando</div></div></div>
+  <slot data-p="sb"></slot>
+  <div class="corpo">
+    <div class="cab">
+      <div><span class="lugar"><i class="ph-bold ph-seal-check"></i>Associação de Moradores</span><h4 class="tit">Moderação</h4></div>
+    </div>
+    <div class="chips rola">
+      <span class="chip on"><i class="ph-bold ph-check"></i>Novas <span class="n">3</span></span><span class="chip">Na prefeitura</span><span class="chip">Denunciadas <span class="n">1</span></span>
+    </div>
+    <div class="widget mod">
+      <div class="linha"><span class="th"><span class="noite"><i class="ph-bold ph-lightbulb-filament"></i></span></span>
+        <span class="tx"><b>Poste apagado há uma semana</b><small>R. Felipe Camarão · 5 apoios</small></span><span class="pill ab">Aberta</span></div>
+      <div class="acoes"><button class="lima"><i class="ph-bold ph-paper-plane-tilt"></i>Encaminhar</button><button class="neutro"><i class="ph-bold ph-check"></i>Resolvida</button><button class="icone" aria-label="Ocultar"><i class="ph-bold ph-eye-slash"></i></button></div>
+    </div>
+    <div class="widget mod">
+      <div class="linha"><span class="th"><img class="ft" src="fotos/alagamento.jpg" alt=""></span>
+        <span class="tx"><b>Alaga a cada chuva forte</b><small>R. Almirante Barroso · 9 apoios</small></span><span class="pill ab">Aberta</span></div>
+      <div class="acoes"><button class="lima"><i class="ph-bold ph-paper-plane-tilt"></i>Encaminhar</button><button class="neutro"><i class="ph-bold ph-check"></i>Resolvida</button><button class="icone" aria-label="Ocultar"><i class="ph-bold ph-eye-slash"></i></button></div>
+    </div>
+    <div class="widget mod">
+      <div class="linha"><span class="th"><i class="ph-bold ph-question"></i></span>
+        <span class="tx"><b>Registro sem relação com o bairro</b><span class="denuncia"><i class="ph-fill ph-flag"></i>Denunciado por 3 moradores</span></span></div>
+      <div class="acoes"><button class="neutro">Manter</button><button class="perigo"><i class="ph-bold ph-eye-slash"></i>Ocultar</button></div>
+    </div>
   </div>
-  <div class="conteudo">
-    <div class="chips"><span class="chip ativo">Abertas</span><span class="chip">Encaminhadas</span><span class="chip">Denunciadas</span><span class="chip">Resolvidas</span></div>
-    <div class="lista" style="padding-bottom:20px">
-      <div class="mod-cartao">
-        <div class="topo-c"><div class="miniatura f-luz" style="width:54px;height:54px"></div>
-          <div style="flex:1"><h3 style="font-size:14px">Poste apagado há uma semana</h3><div class="rua" style="font-size:12px;color:var(--texto-2);margin-top:3px">Rua Felipe Camarão · 5 apoios</div></div></div>
-        <div class="acoes"><button class="enc">Encaminhar</button><button class="res">Resolvida</button><button class="ocu">Ocultar</button></div>
-      </div>
-      <div class="mod-cartao">
-        <div class="topo-c"><div class="miniatura f-agua" style="width:54px;height:54px"></div>
-          <div style="flex:1"><h3 style="font-size:14px">Boca de lobo entupida, alaga com chuva</h3><div class="rua" style="font-size:12px;color:var(--texto-2);margin-top:3px">Rua Almirante Barroso · 9 apoios</div></div></div>
-        <div class="acoes"><button class="enc">Encaminhar</button><button class="res">Resolvida</button><button class="ocu">Ocultar</button></div>
-      </div>
-      <div class="mod-cartao">
-        <div class="topo-c"><div class="miniatura" style="width:54px;height:54px;background:#d9dde2"></div>
-          <div style="flex:1"><h3 style="font-size:14px">Registro sem relação com o bairro</h3><div class="rua" style="font-size:12px;color:var(--texto-2);margin-top:3px">Rua Gustav Salinger · 0 apoios</div>
-            <div class="denuncia">Denunciado por 3 moradores</div></div></div>
-        <div class="acoes"><button>Manter</button><button class="ocu"><svg class="ico" style="width:13px;height:13px;vertical-align:-2px"><use href="#i-olho"/></svg> Ocultar</button></div>
-      </div>
+  <slot data-p="nav" data-on="moderacao"></slot>
+</template>
+
+<!-- ======= 8. avisos ======= -->
+<template id="t-avisos">
+  <slot data-p="sb"></slot>
+  <div class="corpo">
+    <div class="cab-v">
+      <button class="redondo p" data-ir="inicio" aria-label="Voltar"><i class="ph-bold ph-caret-left"></i></button>
+      <div style="flex: 1"><h4 class="tit">Avisos</h4><small>Registros que você fez ou apoiou</small></div>
+      <span class="redondo p" aria-label="Marcar todos como lidos"><i class="ph-bold ph-checks"></i></span>
+    </div>
+    <span class="grupo-a">Hoje</span>
+    <div class="widget avisos-w">
+      <button class="aviso novo" data-ir="detalhe"><span class="ic"><i class="ph-bold ph-paper-plane-tilt"></i></span>
+        <div><p><b>Calçada cedendo perto da escola</b> foi encaminhada à prefeitura pela associação.</p><small>há 2 h</small></div></button>
+      <div class="aviso novo"><span class="ic"><i class="ph-bold ph-users-three"></i></span>
+        <div><p>Seu registro <b>Poste apagado</b> recebeu 3 novos apoios.</p><small>há 5 h</small></div></div>
+    </div>
+    <span class="grupo-a">Esta semana</span>
+    <div class="widget avisos-w">
+      <div class="aviso"><span class="ic"><i class="ph-bold ph-check-circle"></i></span>
+        <div><p><b>Entulho no terreno baldio</b> foi resolvido. Obrigado por apoiar!</p><small>ter, 3 nov</small></div></div>
+      <div class="aviso"><span class="ic"><i class="ph-bold ph-hammer"></i></span>
+        <div><p><b>Alaga a cada chuva forte</b> está em andamento.</p><small>seg, 2 nov</small></div></div>
     </div>
   </div>
 </template>
 
 <script>
   const TELAS = [
-    ["entrar", "1. Entrar"],
-    ["inicio", "2. Início (lista e mapa)"],
-    ["nova", "3. Nova ocorrência"],
-    ["duplicado", "4. Registro parecido"],
-    ["detalhe", "5. Acompanhamento"],
-    ["moderacao", "6. Moderação"],
+    ['entrar', 'Entrar'], ['inicio', 'Início'], ['lista', 'Lista'], ['nova', 'Nova ocorrência'],
+    ['duplicado', 'Registro parecido'], ['detalhe', 'Acompanhamento'], ['moderacao', 'Moderação'], ['avisos', 'Avisos'],
   ];
-  const tela = document.getElementById("tela");
-  const barra = document.getElementById("barra");
+  const estado = { tela: 'entrar', modo: 'navegar', tema: 'claro' };
+  const hash = location.hash.slice(1);
+  if (hash.includes('todas')) estado.modo = 'todas';
+  if (hash.includes('escuro')) estado.tema = 'escuro';
+  const t = TELAS.find(([id]) => hash.includes('t=' + id)); if (t) estado.tela = t[0];
 
-  function ligar(raiz) {
-    raiz.querySelectorAll("[data-ir]").forEach(el => el.addEventListener("click", e => {
-      e.stopPropagation();
-      mostrar(el.dataset.ir);
-    }));
-    raiz.querySelectorAll("[data-modo]").forEach(el => el.addEventListener("click", () => {
-      const mapa = el.dataset.modo === "mapa";
-      raiz.querySelector(".vista-lista").style.display = mapa ? "none" : "";
-      raiz.querySelector(".vista-mapa").style.display = mapa ? "" : "none";
-      raiz.querySelectorAll("[data-modo]").forEach(b => b.classList.toggle("ativo", b === el));
-    }));
-  }
-
-  function mostrar(id) {
-    tela.replaceChildren(document.getElementById("t-" + id).content.cloneNode(true));
-    ligar(tela);
-    barra.querySelectorAll("button").forEach(b => b.classList.toggle("ativo", b.dataset.id === id));
-    history.replaceState(null, "", "#" + id);
-  }
-
-  TELAS.forEach(([id, nome]) => {
-    const b = document.createElement("button");
-    b.textContent = nome;
-    b.dataset.id = id;
-    b.addEventListener("click", () => mostrar(id));
-    barra.append(b);
-  });
-
-  // ?todas mostra as seis telas lado a lado (usado para a figura do relatório)
-  if (new URLSearchParams(location.search).has("todas")) {
-    document.body.classList.add("todas");
-    const grade = document.getElementById("grade");
-    TELAS.forEach(([id, nome]) => {
-      const bloco = document.createElement("div");
-      bloco.innerHTML = '<div class="aparelho"><div class="tela"></div></div><div class="rotulo"></div>';
-      bloco.querySelector(".tela").append(document.getElementById("t-" + id).content.cloneNode(true));
-      bloco.querySelector(".rotulo").textContent = nome;
-      grade.append(bloco);
+  function montar(alvo, id) {
+    alvo.innerHTML = '';
+    alvo.appendChild(document.getElementById('t-' + id).content.cloneNode(true));
+    alvo.querySelectorAll('[data-p]').forEach((el) => {
+      const parte = document.getElementById('p-' + el.dataset.p).content.cloneNode(true);
+      if (el.tagName === 'SLOT') {
+        const on = el.dataset.on;
+        const aba = on && parte.querySelector(`[data-tab="${on}"]`);
+        if (aba) { aba.classList.add('on'); aba.setAttribute('aria-current', 'page'); aba.querySelector('span')?.removeAttribute('hidden'); }
+        if ('foto' in el.dataset) parte.querySelector('.sb')?.classList.add('sobre-foto');
+        el.replaceWith(parte);
+      } else el.prepend(parte);
     });
+    alvo.classList.toggle('escuro', estado.tema === 'escuro');
   }
 
-  const inicial = location.hash.slice(1);
-  mostrar(TELAS.some(([id]) => id === inicial) ? inicial : "entrar");
+  function render() {
+    document.body.classList.toggle('todas', estado.modo === 'todas');
+    document.body.classList.toggle('pg-escura', estado.tema === 'escuro');
+    document.querySelectorAll('#modo button').forEach((b) => b.classList.toggle('ativo', b.dataset.modo === estado.modo));
+    document.querySelectorAll('#tema button').forEach((b) => b.classList.toggle('ativo', b.dataset.tema === estado.tema));
+    const nav = document.getElementById('telas');
+    nav.innerHTML = TELAS.map(([id, nome]) => `<button data-ir="${id}" class="${id === estado.tela ? 'ativo' : ''}">${nome}</button>`).join('');
+    if (estado.modo === 'navegar') montar(document.getElementById('tela'), estado.tela);
+    else {
+      const grade = document.getElementById('grade');
+      grade.innerHTML = '';
+      TELAS.forEach(([id, nome], i) => {
+        const peca = document.createElement('div');
+        peca.className = 'peca';
+        peca.innerHTML = `<div class="fone"><div class="tela"></div></div><div class="rot">${i + 1}. ${nome}</div>`;
+        grade.appendChild(peca);
+        montar(peca.querySelector('.tela'), id);
+      });
+    }
+  }
+
+  document.addEventListener('click', (e) => {
+    const m = e.target.closest('[data-modo]'); if (m) { estado.modo = m.dataset.modo; return render(); }
+    const tm = e.target.closest('[data-tema]'); if (tm) { estado.tema = tm.dataset.tema; return render(); }
+    const ir = e.target.closest('[data-ir]');
+    if (ir) { estado.tela = ir.dataset.ir; if (estado.modo === 'todas' && !ir.closest('#telas')) return; estado.modo = 'navegar'; render(); }
+  });
+  window.addEventListener('hashchange', () => location.reload());
+  render();
 </script>
 </body>
 </html>
