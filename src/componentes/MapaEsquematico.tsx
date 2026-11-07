@@ -17,6 +17,18 @@ const EXEMPLO: { x: number; y: number; categoria: Categoria; nivel: 'forte' | 'p
   { x: 0.84, y: 0.28, categoria: 'buraco', nivel: 'padrao' },
 ];
 
+/** Na tela de entrar o mapa ocupa a altura que sobra; abaixo desta fração ficam o título e o esmaecimento. */
+export const ZONA_TITULO_ALTO = 0.5;
+
+/** Pinos de exemplo do mapa alto, todos acima da faixa do título. */
+export const EXEMPLO_ALTO: typeof EXEMPLO = [
+  { x: 0.84, y: 0.17, categoria: 'buraco', nivel: 'padrao' },
+  { x: 0.4, y: 0.25, categoria: 'calcada', nivel: 'forte' },
+  { x: 0.16, y: 0.36, categoria: 'iluminacao', nivel: 'fraco' },
+  { x: 0.68, y: 0.38, categoria: 'alagamento', nivel: 'padrao' },
+  { x: 0.5, y: 0.44, categoria: 'entulho', nivel: 'fraco' },
+];
+
 /**
  * Projeta as ocorrências numa caixa 0..1 mantendo a posição relativa entre elas (norte para cima).
  * Os números são os apoios (sem apoios, o ícone da categoria); o pino mais apoiado fica em lima e os resolvidos ficam apagados.
@@ -37,17 +49,17 @@ export function posicionar(ocorrencias: readonly Ocorrencia[]): { o: Ocorrencia;
   }));
 }
 
-type Props = { ocorrencias?: readonly Ocorrencia[]; exemplo?: boolean };
+type Props = { ocorrencias?: readonly Ocorrencia[]; exemplo?: boolean; /** Versão alta, com mais ruas, para a tela de entrar. */ alto?: boolean };
 
 /** Mapa ilustrado do bairro (ruas genéricas) com os pinos das ocorrências. É decorativo: a lista ao lado é a fonte acessível. */
-export function MapaEsquematico({ ocorrencias = [], exemplo }: Props) {
+export function MapaEsquematico({ ocorrencias = [], exemplo, alto }: Props) {
   const t = useTema();
   const halo = (nivel: 'forte' | 'padrao' | 'fraco') =>
     nivel === 'forte' ? comAlfa(t.pinos.forte.fundo, 0.25) : nivel === 'padrao' ? comAlfa(t.pinos.padrao.fundo, 0.16) : comAlfa(t.pinos.fraco.fundo, 0.4);
   const tamanho = { forte: 36, padrao: 30, fraco: 28 } as const;
 
   const pinos: Pino[] = exemplo
-    ? EXEMPLO.map((p, i) => ({ id: String(i), x: p.x, y: p.y, tamanho: tamanho[p.nivel], par: t.pinos[p.nivel], halo: halo(p.nivel), categoria: p.categoria }))
+    ? (alto ? EXEMPLO_ALTO : EXEMPLO).map((p, i) => ({ id: String(i), x: p.x, y: p.y, tamanho: tamanho[p.nivel], par: t.pinos[p.nivel], halo: halo(p.nivel), categoria: p.categoria }))
     : posicionar(ocorrencias).map(({ o, x, y, nivel }) => ({
         id: o.id,
         x,
@@ -61,15 +73,34 @@ export function MapaEsquematico({ ocorrencias = [], exemplo }: Props) {
 
   return (
     <View style={StyleSheet.absoluteFill} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Svg width="100%" height="100%" viewBox="0 0 358 190" preserveAspectRatio="xMidYMid slice" style={StyleSheet.absoluteFill}>
-        <Rect width={358} height={190} fill={t.mapa.terra} />
-        <Path d="M250 120 q 50 -24 120 6 v 70 h -120 z" fill={t.mapa.agua} />
-        <Rect x={160} y={58} width={52} height={36} rx={10} fill={t.mapa.parque} />
-        <Path d="M-10 128 C 80 100, 160 158, 368 110" stroke={t.mapa.rua} strokeWidth={15} fill="none" />
-        <Path d="M118 -10 L 146 200" stroke={t.mapa.rua} strokeWidth={11} />
-        <Path d="M248 -10 L 228 200" stroke={t.mapa.rua} strokeWidth={9} />
-        <Path d="M-10 46 L 368 30" stroke={t.mapa.rua} strokeWidth={7} />
-      </Svg>
+      {alto ? (
+        // Proporção de celular em pé: ruas no mesmo traço do mapa pequeno, sem ampliar.
+        <Svg width="100%" height="100%" viewBox="0 0 358 640" preserveAspectRatio="xMidYMin slice" style={StyleSheet.absoluteFill}>
+          <Rect width={358} height={640} fill={t.mapa.terra} />
+          <Path d="M230 250 q 60 -26 140 4 v 120 q -70 -24 -140 6 z" fill={t.mapa.agua} />
+          <Rect x={160} y={120} width={52} height={40} rx={10} fill={t.mapa.parque} />
+          <Rect x={30} y={420} width={60} height={36} rx={10} fill={t.mapa.parque} />
+          <Path d="M-10 70 L 368 52" stroke={t.mapa.rua} strokeWidth={7} />
+          <Path d="M-10 206 C 80 178, 160 236, 368 188" stroke={t.mapa.rua} strokeWidth={15} fill="none" />
+          <Path d="M-10 330 L 368 312" stroke={t.mapa.rua} strokeWidth={7} />
+          <Path d="M-10 470 C 120 448, 220 500, 368 458" stroke={t.mapa.rua} strokeWidth={11} fill="none" />
+          <Path d="M-10 590 L 368 600" stroke={t.mapa.rua} strokeWidth={7} />
+          <Path d="M118 -10 L 146 650" stroke={t.mapa.rua} strokeWidth={11} />
+          <Path d="M248 -10 L 228 650" stroke={t.mapa.rua} strokeWidth={9} />
+          <Path d="M40 260 L 58 650" stroke={t.mapa.rua} strokeWidth={6} />
+          <Path d="M320 -10 L 300 240" stroke={t.mapa.rua} strokeWidth={6} />
+        </Svg>
+      ) : (
+        <Svg width="100%" height="100%" viewBox="0 0 358 190" preserveAspectRatio="xMidYMid slice" style={StyleSheet.absoluteFill}>
+          <Rect width={358} height={190} fill={t.mapa.terra} />
+          <Path d="M250 120 q 50 -24 120 6 v 70 h -120 z" fill={t.mapa.agua} />
+          <Rect x={160} y={58} width={52} height={36} rx={10} fill={t.mapa.parque} />
+          <Path d="M-10 128 C 80 100, 160 158, 368 110" stroke={t.mapa.rua} strokeWidth={15} fill="none" />
+          <Path d="M118 -10 L 146 200" stroke={t.mapa.rua} strokeWidth={11} />
+          <Path d="M248 -10 L 228 200" stroke={t.mapa.rua} strokeWidth={9} />
+          <Path d="M-10 46 L 368 30" stroke={t.mapa.rua} strokeWidth={7} />
+        </Svg>
+      )}
       {pinos.map((p) => (
         <View
           key={p.id}
