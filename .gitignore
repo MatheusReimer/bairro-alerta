@@ -55,3 +55,6 @@ e2e-relatorio/
 test-results/
 dist-web/
 .firebase/
+
+# casos reais tirados da imprensa (fotos de terceiros, conta e senha da equipe): ficam fora do git
+noticias/

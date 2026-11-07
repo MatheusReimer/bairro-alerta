@@ -26,6 +26,12 @@ O relatório final vence em **30/11/2026**. Para sobrar tempo de analisar os dad
 5. Cadastrar os moderadores: depois que a pessoa da associação criar a conta no app, copiar o UID dela em
    Authentication e criar no Firestore o documento `moderadores/<UID>` com o campo `nome`.
 6. Fazer um teste completo com dois celulares antes de convidar os moradores.
+7. Antes do convite, cada integrante da equipe registra no app 3 ou 4 problemas reais do bairro, com foto no local,
+   e apoia ("Eu também vi") os registros dos colegas que também viu. Assim o primeiro morador já encontra um mapa
+   com atividade real. No relatório, informe que os primeiros registros foram feitos pela equipe.
+8. Já foram registrados 7 problemas do bairro noticiados pela imprensa (ND Mais e O Blumenauense), com a foto, a data
+   e a fonte da notícia, pelo script local `noticias/importar.mjs` (fora do git, porque as fotos são de terceiros).
+   Eles não entram nas métricas do piloto; `node noticias/importar.mjs apagar` remove todos.
 
 ## 3. Como os moradores instalam
 
