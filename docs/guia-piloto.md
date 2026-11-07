@@ -22,24 +22,42 @@ O relatório final vence em **30/11/2026**. Para sobrar tempo de analisar os dad
    Não é preciso o Storage: as fotos ficam no Firestore.
 2. Publicar as regras: `npx firebase deploy --only firestore:rules --project <id-do-projeto>`.
 3. Preencher o `.env` com as chaves do app web do projeto e `EXPO_PUBLIC_USE_EMULATORS=0`.
-4. Publicar a versão web (ver Seção 3).
+4. Gerar o APK do Android e publicar a versão web para iPhone (ver Seção 3).
 5. Cadastrar os moderadores: depois que a pessoa da associação criar a conta no app, copiar o UID dela em
    Authentication e criar no Firestore o documento `moderadores/<UID>` com o campo `nome`.
 6. Fazer um teste completo com dois celulares antes de convidar os moradores.
 
 ## 3. Como os moradores instalam
 
-Não é preciso instalar nada. O piloto usa a versão web do Bairro Alerta, publicada no Firebase Hosting (gratuito):
+**Android (principal):** o piloto usa o aplicativo Android, gerado pelo EAS Build (perfil `preview` do `eas.json`,
+que produz um `.apk` de distribuição interna):
 
 ```
-npx expo export --platform web --output-dir dist-web
-npx firebase deploy --only hosting --project <id-do-projeto>
+npx eas-cli@latest login
+npx eas-cli@latest build -p android --profile preview
 ```
 
-O morador abre o link (`https://<id-do-projeto>.web.app`) no navegador do celular, Android ou iPhone. Dica para
-mandar no grupo: "abra o link e toque em Compartilhar > Adicionar à tela inicial para ficar como um app".
+O EAS devolve um link de instalação. Mande o link no grupo (ou gere um QR code dele). No celular, o morador abre
+o link, baixa o arquivo e aceita o aviso de "instalar apps desconhecidos", porque o app não vem da Play Store.
+
+Antes do primeiro build:
+
+1. As chaves do Firebase ficam no `.env`, que não vai para o git nem para o EAS. Cadastre as mesmas variáveis
+   `EXPO_PUBLIC_*` como variáveis de ambiente do projeto no EAS (painel do Expo ou `eas env:create`).
+2. O mapa no Android precisa de uma chave do Google Maps: projeto no Google Cloud com o **Maps SDK for Android**
+   ativado, chave restrita a apps Android com o nome do pacote e o SHA-1 do certificado que assina o APK
+   (painel do Expo > Credentials). A chave vai no plugin `react-native-maps` (`androidGoogleMapsApiKey`), lida de
+   variável de ambiente pelo `app.config`. Depois de configurar, gere o build de novo.
+
+**iPhone (alternativa):** instalar no iPhone exige o programa pago da Apple, então quem usa iPhone continua com a
+versão web, publicada no Firebase Hosting:
+
+```
+npm run publicar
+```
+
+O morador abre `https://<id-do-projeto>.web.app` no navegador e toca em Compartilhar > Adicionar à tela inicial.
 Câmera e GPS funcionam pelo navegador; o mapa aparece como lista de pontos com link para o OpenStreetMap.
-O app nativo (com mapa interativo) é demonstrado pela equipe com o Expo Go.
 
 ## 4. Roteiro para os participantes
 
