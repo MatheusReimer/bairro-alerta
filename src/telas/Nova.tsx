@@ -1,9 +1,13 @@
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CartaoOcorrencia } from '../componentes/CartaoOcorrencia';
-import { Botao, Chip, cores, Mensagem, Secao } from '../componentes/ui';
+import { Icone } from '../componentes/icones';
+import { fontes, useEstilos, useTema, type Tema } from '../componentes/tema';
+import { Botao, BotaoRedondo, Chip, Mensagem, Widget } from '../componentes/ui';
+import { voltar } from '../componentes/voltar';
 import { useAmbiente, useOcorrencias, useUsuario, type OrigemFoto } from '../contexto/ambiente';
 import { CATEGORIAS, DESCRICAO_MAXIMA, type Categoria, type Local, type Ocorrencia } from '../domain/ocorrencia';
 import { ErroRegra } from '../domain/regras';
@@ -16,6 +20,8 @@ export function Nova() {
   const { servico, localizacao, obterFoto } = useAmbiente();
   const usuario = useUsuario();
   const ocorrencias = useOcorrencias();
+  const t = useTema();
+  const e = useEstilos(criarEstilos);
 
   const [fotoUri, setFotoUri] = useState<string | null>(null);
   const [categoria, setCategoria] = useState<Categoria | null>(null);
@@ -91,123 +97,261 @@ export function Nova() {
   }
 
   const podeEnviar = !!fotoUri && !!categoria && !!local && !enviando;
+  const etapas = [!!fotoUri, !!categoria, !!local].filter(Boolean).length;
 
   if (semelhantes && semelhantes.length > 0) {
     const [maisPerto] = semelhantes;
     const jaMinha = maisPerto.autorId === usuario.uid || maisPerto.apoiadores.includes(usuario.uid);
     return (
-      <ScrollView contentContainerStyle={estilos.tela}>
-        <Text accessibilityRole="header" style={estilos.titulo}>
-          Já existe um registro parecido aqui
-        </Text>
-        <Text style={estilos.texto}>
-          Apoiar o registro que já existe mostra à prefeitura que mais gente é afetada, sem duplicar o problema.
-        </Text>
-        <CartaoOcorrencia
-          ocorrencia={maisPerto}
-          aoPressionar={() => router.push(`/ocorrencia/${maisPerto.id}`)}
-          extra={`a ${Math.round(distanciaMetros(local!, maisPerto.local))} m`}
-        />
-        {erro ? <Mensagem texto={erro} tipo="erro" /> : null}
-        <Botao titulo={jaMinha ? 'Ver esta' : 'Apoiar esta'} aoPressionar={() => apoiarExistente(maisPerto)} />
-        <Botao
-          titulo="Criar nova mesmo assim"
-          variante="secundario"
-          aoPressionar={registrar}
-          carregando={enviando}
-          estilo={{ marginTop: 12 }}
-        />
-      </ScrollView>
+      <View style={e.fundoFolha}>
+        {fotoUri ? <Image source={{ uri: fotoUri }} style={e.fotoAoFundo} accessibilityElementsHidden importantForAccessibility="no" /> : null}
+        <View style={e.veu} />
+        <ScrollView contentContainerStyle={e.rolagemFolha}>
+          <View style={e.folha}>
+            <View style={e.alca} />
+            <View style={e.selo}>
+              <Icone nome="vizinhos" cor={t.cores.sobreDestaque} tamanho={26} peso="bold" />
+            </View>
+            <Text accessibilityRole="header" style={e.tituloFolha}>
+              Já existe um registro parecido aqui
+            </Text>
+            <Text style={e.textoFolha}>
+              Apoiar o registro que já existe mostra à prefeitura que mais gente é afetada, sem duplicar o problema.
+            </Text>
+            <View style={e.caixaParecida}>
+              <CartaoOcorrencia
+                ocorrencia={maisPerto}
+                aoPressionar={() => router.push(`/ocorrencia/${maisPerto.id}`)}
+                extra={`a ${Math.round(distanciaMetros(local!, maisPerto.local))} m`}
+                sobreFundo
+              />
+            </View>
+            {erro ? <Mensagem texto={erro} tipo="erro" /> : null}
+            <Botao
+              titulo={jaMinha ? 'Ver esta' : 'Apoiar esta'}
+              icone={jaMinha ? 'olho' : 'apoio'}
+              aoPressionar={() => apoiarExistente(maisPerto)}
+              estilo={{ marginTop: 6 }}
+            />
+            <Botao titulo="Criar nova mesmo assim" variante="fantasma" aoPressionar={registrar} carregando={enviando} estilo={{ marginTop: 4 }} />
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
+
+  let blocoLocal: ReactNode;
+  if (buscandoLocal) {
+    blocoLocal = (
+      <>
+        <ActivityIndicator color={t.cores.texto} />
+        <Text style={e.textoLocal}>Buscando sua localização...</Text>
+      </>
+    );
+  } else if (local) {
+    blocoLocal = (
+      <>
+        <View style={e.pinoLocal}>
+          <Icone nome="local" cor={t.cores.sobreDestaque} tamanho={15} peso="fill" />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={e.textoLocal}>Local marcado pelo GPS</Text>
+          <Text style={e.subLocal}>Sua posição atual</Text>
+        </View>
+      </>
     );
   }
 
   return (
-    <ScrollView contentContainerStyle={estilos.tela} keyboardShouldPersistTaps="handled">
-      <Secao titulo="Foto">
-        {fotoUri ? (
-          <Image source={{ uri: fotoUri }} style={estilos.foto} accessibilityLabel="Foto do problema" />
-        ) : (
-          <View style={[estilos.foto, estilos.semFoto]}>
-            <Text style={{ color: cores.cinza }}>Nenhuma foto ainda</Text>
-          </View>
-        )}
-        <View style={estilos.linha}>
-          <Botao titulo="Tirar foto" aoPressionar={() => escolherFoto('camera')} estilo={{ flex: 1 }} />
-          <Botao titulo="Escolher da galeria" variante="secundario" aoPressionar={() => escolherFoto('galeria')} estilo={{ flex: 1 }} />
-        </View>
-      </Secao>
-
-      <Secao titulo="Categoria">
-        <View style={estilos.chips}>
-          {CATEGORIAS.map((c) => (
-            <Chip
-              key={c.id}
-              texto={`${c.icone} ${c.rotulo}`}
-              rotulo={c.rotulo}
-              selecionado={categoria === c.id}
-              aoPressionar={() => {
-                setCategoria(c.id);
-                setSemelhantes(null);
-              }}
-            />
+    <SafeAreaView style={e.tela} edges={['top', 'bottom']}>
+      <View style={e.barraTopo}>
+        <BotaoRedondo icone="fechar" rotulo="Fechar" tamanho={44} aoPressionar={voltar} />
+        <View style={e.progresso} accessible accessibilityLabel={`${etapas} de 3 itens obrigatórios preenchidos`}>
+          {[0, 1, 2].map((i) => (
+            <View key={i} style={[e.segmento, i < etapas && e.segmentoFeito]} />
           ))}
         </View>
-      </Secao>
+        <Text style={e.textoProgresso} importantForAccessibility="no" accessibilityElementsHidden>
+          {etapas} de 3
+        </Text>
+      </View>
 
-      <Secao titulo="Local">
-        {buscandoLocal ? (
-          <View style={estilos.linha}>
-            <ActivityIndicator color={cores.azul} />
-            <Text style={estilos.texto}>Buscando sua localização...</Text>
-          </View>
-        ) : local ? (
-          <View style={estilos.linha}>
-            <Text accessibilityElementsHidden importantForAccessibility="no">📍</Text>
-            <Text style={estilos.texto}>Local marcado pelo GPS</Text>
+      <ScrollView contentContainerStyle={e.rolagem} keyboardShouldPersistTaps="handled">
+        <Text accessibilityRole="header" style={e.titulo}>
+          O que você encontrou?
+        </Text>
+
+        {fotoUri ? (
+          <View style={e.foto}>
+            <Image source={{ uri: fotoUri }} style={StyleSheet.absoluteFill} accessibilityLabel="Foto do problema" resizeMode="cover" />
+            <View style={e.privacidade}>
+              <Icone nome="feito" cor={t.cores.destaque} tamanho={14} peso="bold" />
+              <Text style={e.textoPrivacidade}>Dados de localização da foto removidos no envio</Text>
+            </View>
+            {blocoLocal ? <View style={e.localSobreFoto}>{blocoLocal}</View> : null}
           </View>
         ) : (
-          <>
-            <Mensagem texto={erroLocal ?? ''} tipo="erro" />
-            <Botao titulo="Tentar de novo" variante="secundario" aoPressionar={buscarLocal} />
-          </>
+          <View style={[e.foto, e.semFoto]}>
+            <View style={e.iconeFoto}>
+              <Icone nome="camera" cor={t.cores.texto} tamanho={26} peso="bold" />
+            </View>
+            <Text style={e.textoSemFoto}>Nenhuma foto ainda</Text>
+            <Text style={e.dicaSemFoto}>Uma foto ajuda a associação a entender o problema.</Text>
+          </View>
         )}
-      </Secao>
 
-      <Secao titulo="Descrição (opcional)">
-        <TextInput
-          accessibilityLabel="Descrição (opcional)"
-          style={estilos.campo}
-          value={descricao}
-          onChangeText={setDescricao}
-          multiline
-          maxLength={DESCRICAO_MAXIMA}
-          placeholder="Ex.: buraco fundo perto do ponto de ônibus"
+        <View style={e.linha}>
+          <Botao titulo="Tirar foto" icone="camera" variante="secundario" aoPressionar={() => escolherFoto('camera')} estilo={e.botaoFoto} />
+          <Botao
+            titulo="Escolher da galeria"
+            icone="galeria"
+            variante="secundario"
+            aoPressionar={() => escolherFoto('galeria')}
+            estilo={[e.botaoFoto, { flex: 1.4 }]}
+          />
+        </View>
+
+        {!fotoUri && blocoLocal ? <View style={e.localSolto}>{blocoLocal}</View> : null}
+        {!buscandoLocal && !local ? (
+          <View style={{ gap: 8 }}>
+            <Mensagem texto={erroLocal ?? ''} tipo="erro" estilo={{ marginVertical: 0 }} />
+            <Botao titulo="Tentar de novo" variante="secundario" aoPressionar={buscarLocal} />
+          </View>
+        ) : null}
+
+        <Widget>
+          <Text style={e.rotulo}>Escolha o tipo</Text>
+          <View style={e.chips}>
+            {CATEGORIAS.map((c) => (
+              <Chip
+                key={c.id}
+                texto={c.rotulo}
+                selecionado={categoria === c.id}
+                aoPressionar={() => {
+                  setCategoria(c.id);
+                  setSemelhantes(null);
+                }}
+              />
+            ))}
+          </View>
+        </Widget>
+
+        <Widget>
+          <View style={e.linhaRotulo}>
+            <Icone nome="descricao" cor={t.cores.suave} tamanho={17} peso="bold" />
+            <Text style={e.rotulo}>Descrição (opcional)</Text>
+          </View>
+          <TextInput
+            accessibilityLabel="Descrição (opcional)"
+            style={e.campo}
+            value={descricao}
+            onChangeText={setDescricao}
+            multiline
+            maxLength={DESCRICAO_MAXIMA}
+            placeholder="Ex.: buraco fundo perto do ponto de ônibus"
+            placeholderTextColor={t.cores.suave}
+          />
+        </Widget>
+
+        {erro ? <Mensagem texto={erro} tipo="erro" /> : null}
+      </ScrollView>
+
+      <View style={e.rodape}>
+        <Botao titulo="Cancelar" variante="secundario" aoPressionar={voltar} estilo={{ flex: 1, borderWidth: 0 }} />
+        <Botao
+          titulo="Enviar"
+          iconeDepois="avancar"
+          aoPressionar={enviar}
+          desabilitado={!podeEnviar}
+          carregando={enviando}
+          estilo={{ flex: 1.3 }}
         />
-      </Secao>
-
-      {erro ? <Mensagem texto={erro} tipo="erro" /> : null}
-      <Botao titulo="Enviar" aoPressionar={enviar} desabilitado={!podeEnviar} carregando={enviando} estilo={{ marginTop: 20 }} />
-    </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 }
 
-const estilos = StyleSheet.create({
-  tela: { padding: 16, paddingBottom: 40, backgroundColor: cores.fundo, flexGrow: 1 },
-  titulo: { fontSize: 20, fontWeight: '700', color: cores.azulEscuro, marginBottom: 8 },
-  texto: { color: cores.texto, fontSize: 15, marginBottom: 12 },
-  foto: { width: '100%', aspectRatio: 4 / 3, borderRadius: 12, marginBottom: 12, backgroundColor: cores.azulClaro },
-  semFoto: { alignItems: 'center', justifyContent: 'center' },
-  linha: { flexDirection: 'row', gap: 12, alignItems: 'center' },
-  chips: { flexDirection: 'row', flexWrap: 'wrap' },
-  campo: {
-    borderWidth: 1,
-    borderColor: cores.borda,
-    borderRadius: 10,
-    padding: 12,
-    minHeight: 96,
-    fontSize: 16,
-    textAlignVertical: 'top',
-    backgroundColor: cores.branco,
-    color: cores.texto,
-  },
-});
+const criarEstilos = ({ cores: c }: Tema) =>
+  StyleSheet.create({
+    tela: { flex: 1, backgroundColor: c.fundo },
+    barraTopo: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingTop: 8, width: '100%', maxWidth: 720, alignSelf: 'center' },
+    progresso: { flex: 1, flexDirection: 'row', gap: 5 },
+    segmento: { flex: 1, height: 5, borderRadius: 3, backgroundColor: c.trilho },
+    segmentoFeito: { backgroundColor: c.texto },
+    textoProgresso: { color: c.suave, fontFamily: fontes.media, fontSize: 12.5 },
+    rolagem: { padding: 16, paddingTop: 14, paddingBottom: 24, gap: 14, width: '100%', maxWidth: 720, alignSelf: 'center' },
+    titulo: { color: c.texto, fontFamily: fontes.titulo, fontSize: 28, lineHeight: 30, letterSpacing: -0.7, marginHorizontal: 4 },
+    foto: { height: 210, borderRadius: 26, overflow: 'hidden', backgroundColor: c.cartao },
+    semFoto: { alignItems: 'center', justifyContent: 'center', gap: 6, padding: 20 },
+    iconeFoto: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', backgroundColor: c.fundo, marginBottom: 4 },
+    textoSemFoto: { color: c.texto, fontFamily: fontes.semi, fontSize: 15 },
+    dicaSemFoto: { color: c.suave, fontFamily: fontes.regular, fontSize: 13, textAlign: 'center' },
+    privacidade: {
+      position: 'absolute',
+      left: 12,
+      top: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      paddingVertical: 6,
+      paddingLeft: 8,
+      paddingRight: 11,
+      borderRadius: 16,
+      backgroundColor: 'rgba(22,22,22,0.72)',
+    },
+    textoPrivacidade: { color: '#F2F2EE', fontFamily: fontes.media, fontSize: 12 },
+    localSobreFoto: {
+      position: 'absolute',
+      left: 12,
+      right: 12,
+      bottom: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      borderRadius: 18,
+      backgroundColor: c.vidro,
+    },
+    localSolto: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: 22, backgroundColor: c.cartao },
+    pinoLocal: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: c.destaque },
+    textoLocal: { color: c.texto, fontFamily: fontes.semi, fontSize: 14 },
+    subLocal: { color: c.suave, fontFamily: fontes.regular, fontSize: 12 },
+    linha: { flexDirection: 'row', gap: 10 },
+    botaoFoto: { flex: 1, minHeight: 48, paddingHorizontal: 12, borderWidth: 0 },
+    rotulo: { color: c.suave, fontFamily: fontes.regular, fontSize: 14 },
+    linhaRotulo: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
+    campo: {
+      marginTop: 10,
+      borderRadius: 16,
+      padding: 14,
+      minHeight: 96,
+      fontSize: 15,
+      fontFamily: fontes.regular,
+      textAlignVertical: 'top',
+      backgroundColor: c.fundo,
+      color: c.texto,
+    },
+    rodape: { flexDirection: 'row', gap: 10, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16, width: '100%', maxWidth: 720, alignSelf: 'center' },
+    fundoFolha: { flex: 1, backgroundColor: c.fundo },
+    fotoAoFundo: { position: 'absolute', top: 0, left: 0, right: 0, height: 360 },
+    veu: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: c.veu },
+    rolagemFolha: { flexGrow: 1, justifyContent: 'flex-end', paddingTop: 120 },
+    folha: {
+      backgroundColor: c.cartao,
+      borderTopLeftRadius: 32,
+      borderTopRightRadius: 32,
+      padding: 16,
+      paddingTop: 10,
+      paddingBottom: 32,
+      width: '100%',
+      maxWidth: 640,
+      alignSelf: 'center',
+    },
+    alca: { width: 40, height: 5, borderRadius: 3, backgroundColor: c.trilho, alignSelf: 'center', marginBottom: 16 },
+    selo: { width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center', backgroundColor: c.destaque, marginBottom: 14 },
+    tituloFolha: { color: c.texto, fontFamily: fontes.titulo, fontSize: 24, letterSpacing: -0.5, lineHeight: 27 },
+    textoFolha: { color: c.suave, fontFamily: fontes.regular, fontSize: 14.5, lineHeight: 21, marginTop: 8 },
+    caixaParecida: { backgroundColor: c.fundo, borderRadius: 22, paddingHorizontal: 14, paddingVertical: 2, marginTop: 16, marginBottom: 10 },
+  });

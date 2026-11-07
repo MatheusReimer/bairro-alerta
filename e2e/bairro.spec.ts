@@ -128,11 +128,13 @@ test('fluxo do bairro: vizinho apoia pela sugestão, moderação encaminha e ocu
   await moderacao.getByRole('button', { name: /Alagamento na Rua Hermann Hering/ }).click();
   await moderacao.getByRole('button', { name: 'Marcar como Encaminhada à prefeitura' }).click();
   await expect(moderacao.getByRole('button', { name: 'Marcar como Em andamento' })).toBeVisible();
+  await moderacao.getByRole('button', { name: 'Ocultar dos moradores' }).scrollIntoViewIfNeeded();
   await capturar(moderacao, '06-moderacao');
 
   // Maria recebe o aviso (T-09-01) e abre a ocorrência por ele.
   await expect(page.getByRole('button', { name: 'Avisos, 1 não lido' })).toBeVisible();
   await page.getByRole('button', { name: 'Avisos, 1 não lido' }).click();
+  await expect(page.getByRole('button', { name: /Alagamento: Encaminhada à prefeitura/ })).toBeVisible();
   await capturar(page, '07-avisos');
   await page.getByRole('button', { name: /Alagamento: Encaminhada à prefeitura/ }).click();
   await expect(page.getByText('Encaminhada à prefeitura em')).toBeVisible();

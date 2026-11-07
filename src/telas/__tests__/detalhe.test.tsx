@@ -34,7 +34,7 @@ describe('Detalhe da ocorrência (histórias #7 e #8)', () => {
 
     await user.press(await screen.findByRole('button', { name: 'Eu também vi este problema' }));
 
-    expect(await screen.findByText('1 apoio')).toBeOnTheScreen();
+    expect(await screen.findByLabelText('1 apoio')).toBeOnTheScreen();
     expect(screen.getByText('Você apoiou esta ocorrência')).toBeOnTheScreen();
     expect(repositorio.todas()[0].apoiadores).toEqual([UID_MARIA]);
   });

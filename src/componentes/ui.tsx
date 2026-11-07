@@ -2,41 +2,38 @@ import type { ReactNode } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import type { Status } from '../domain/ocorrencia';
-
-/** Paleta do protótipo da Etapa 1 (design/prototipo.html). */
-export const cores = {
-  azul: '#2E74B5',
-  azulEscuro: '#1F4E79',
-  azulClaro: '#DEEAF6',
-  fundo: '#f4f6f9',
-  texto: '#1d2733',
-  cinza: '#5f6b78',
-  borda: '#e3e8ee',
-  verde: '#2e8b57',
-  amarelo: '#9a6a00',
-  vermelho: '#c0392b',
-  branco: '#ffffff',
-};
-
-export const corDoStatus: Record<Status, string> = {
-  aberta: cores.vermelho,
-  encaminhada: cores.amarelo,
-  em_andamento: cores.azul,
-  resolvida: cores.verde,
-};
+import { Icone, type NomeIcone } from './icones';
+import { fontes, useEstilos, useTema, type Par, type Tema } from './tema';
 
 type BotaoProps = {
   titulo: string;
   aoPressionar: () => void;
-  variante?: 'primario' | 'secundario' | 'perigo';
+  variante?: 'primario' | 'secundario' | 'perigo' | 'fantasma';
   desabilitado?: boolean;
   carregando?: boolean;
   rotulo?: string;
+  icone?: NomeIcone;
+  iconeDepois?: NomeIcone;
   estilo?: StyleProp<ViewStyle>;
 };
 
-export function Botao({ titulo, aoPressionar, variante = 'primario', desabilitado, carregando, rotulo, estilo }: BotaoProps) {
+/** Botão em pílula: lima para a ação principal, branco para as secundárias. */
+export function Botao({
+  titulo,
+  aoPressionar,
+  variante = 'primario',
+  desabilitado,
+  carregando,
+  rotulo,
+  icone,
+  iconeDepois,
+  estilo,
+}: BotaoProps) {
+  const t = useTema();
+  const e = useEstilos(criarEstilos);
   const inativo = desabilitado || carregando;
+  const corTexto =
+    variante === 'primario' ? t.cores.sobreDestaque : variante === 'perigo' ? t.cores.erro : variante === 'fantasma' ? t.cores.suave : t.cores.texto;
   return (
     <Pressable
       accessibilityRole="button"
@@ -45,74 +42,159 @@ export function Botao({ titulo, aoPressionar, variante = 'primario', desabilitad
       disabled={inativo}
       onPress={aoPressionar}
       style={({ pressed }) => [
-        estilos.botao,
-        variante === 'primario' && estilos.primario,
-        variante === 'secundario' && estilos.secundario,
-        variante === 'perigo' && estilos.perigo,
-        inativo && estilos.inativo,
-        pressed && { opacity: 0.8 },
+        e.botao,
+        variante === 'primario' && e.primario,
+        variante === 'secundario' && e.secundario,
+        variante === 'perigo' && e.perigo,
+        variante === 'fantasma' && e.fantasma,
+        inativo && e.inativo,
+        pressed && { opacity: 0.85, transform: [{ scale: 0.99 }] },
         estilo,
       ]}
     >
       {carregando ? (
-        <ActivityIndicator color={variante === 'primario' ? cores.branco : cores.azul} />
+        <ActivityIndicator color={corTexto} />
       ) : (
-        <Text style={[estilos.textoBotao, variante !== 'primario' && { color: variante === 'perigo' ? cores.vermelho : cores.azul }]}>
-          {titulo}
-        </Text>
+        <View style={e.conteudoBotao}>
+          {icone ? <Icone nome={icone} cor={corTexto} tamanho={18} peso="bold" /> : null}
+          <Text style={[e.textoBotao, { color: corTexto }]}>{titulo}</Text>
+          {iconeDepois ? <Icone nome={iconeDepois} cor={corTexto} tamanho={18} peso="bold" /> : null}
+        </View>
       )}
     </Pressable>
   );
 }
 
-type ChipProps = { texto: string; selecionado: boolean; aoPressionar: () => void; rotulo?: string };
+type BotaoRedondoProps = {
+  icone: NomeIcone;
+  rotulo: string;
+  aoPressionar: () => void;
+  tamanho?: number;
+  /** Fundo translúcido, para ficar sobre fotos. */
+  sobreFoto?: boolean;
+  children?: ReactNode;
+  estilo?: StyleProp<ViewStyle>;
+};
 
-export function Chip({ texto, selecionado, aoPressionar, rotulo }: ChipProps) {
+/** Botão circular só com ícone (voltar, fechar, avisos, sair). O rótulo é o que o leitor de tela anuncia. */
+export function BotaoRedondo({ icone, rotulo, aoPressionar, tamanho = 48, sobreFoto, children, estilo }: BotaoRedondoProps) {
+  const t = useTema();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={rotulo}
+      onPress={aoPressionar}
+      hitSlop={4}
+      style={({ pressed }) => [
+        {
+          width: tamanho,
+          height: tamanho,
+          borderRadius: tamanho / 2,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: sobreFoto ? 'rgba(255,255,255,0.92)' : t.cores.cartao,
+        },
+        pressed && { opacity: 0.8 },
+        estilo,
+      ]}
+    >
+      <Icone nome={icone} cor={sobreFoto ? '#161616' : t.cores.texto} tamanho={20} peso="bold" />
+      {children}
+    </Pressable>
+  );
+}
+
+type ChipProps = {
+  texto: string;
+  selecionado: boolean;
+  aoPressionar: () => void;
+  rotulo?: string;
+  /** Menor, para filtros que aparecem em grupo. */
+  compacto?: boolean;
+  estilo?: StyleProp<ViewStyle>;
+};
+
+/** Chip de escolha: contorno quando livre, grafite com um visto em lima quando escolhido. */
+export function Chip({ texto, selecionado, aoPressionar, rotulo, compacto, estilo }: ChipProps) {
+  const t = useTema();
+  const e = useEstilos(criarEstilos);
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={rotulo ?? texto}
       accessibilityState={{ selected: selecionado }}
       onPress={aoPressionar}
-      style={[estilos.chip, selecionado && estilos.chipSelecionado]}
+      hitSlop={compacto ? 4 : undefined}
+      style={({ pressed }) => [e.chip, compacto && e.chipCompacto, selecionado && e.chipSelecionado, pressed && { opacity: 0.8 }, estilo]}
     >
-      <Text style={[estilos.textoChip, selecionado && { color: cores.branco }]}>{texto}</Text>
+      {selecionado ? <Icone nome="feito" cor={t.cores.chipAtivoIcone} tamanho={compacto ? 13 : 15} peso="bold" /> : null}
+      <Text style={[e.textoChip, compacto && e.textoChipCompacto, selecionado && e.textoChipSelecionado]}>{texto}</Text>
     </Pressable>
   );
 }
 
-export function Selo({ texto, cor }: { texto: string; cor: string }) {
+/** Rótulos curtos do status, para os selos (o rótulo completo continua no histórico e nos filtros). */
+export const ROTULO_CURTO_STATUS: Record<Status, string> = {
+  aberta: 'Aberta',
+  encaminhada: 'Na prefeitura',
+  em_andamento: 'Em andamento',
+  resolvida: 'Resolvida',
+};
+
+/** Selo em pílula: texto e fundo de um par de cores do tema. */
+export function Selo({ texto, par, estilo }: { texto: string; par: Par; estilo?: StyleProp<ViewStyle> }) {
+  const e = useEstilos(criarEstilos);
   return (
-    <View style={[estilos.selo, { borderColor: cor }]}>
-      <Text style={[estilos.textoSelo, { color: cor }]}>{texto}</Text>
+    <View style={[e.selo, { backgroundColor: par.fundo }, estilo]}>
+      <Text style={[e.textoSelo, { color: par.texto }]}>{texto}</Text>
     </View>
   );
 }
 
-export function Mensagem({ texto, tipo = 'info' }: { texto: string; tipo?: 'info' | 'erro' | 'sucesso' }) {
-  const cor = tipo === 'erro' ? cores.vermelho : tipo === 'sucesso' ? cores.verde : cores.azulEscuro;
+export function Mensagem({
+  texto,
+  tipo = 'info',
+  estilo,
+}: {
+  texto: string;
+  tipo?: 'info' | 'erro' | 'sucesso';
+  estilo?: StyleProp<ViewStyle>;
+}) {
+  const t = useTema();
+  const e = useEstilos(criarEstilos);
+  const icone: NomeIcone = tipo === 'erro' ? 'alerta' : tipo === 'sucesso' ? 'feito' : 'info';
+  const fundoIcone = tipo === 'erro' ? t.cores.erroFundo : tipo === 'sucesso' ? t.cores.destaque : t.cores.fundo;
+  const corIcone = tipo === 'erro' ? t.cores.erro : tipo === 'sucesso' ? t.cores.sobreDestaque : t.cores.texto;
   return (
-    <View accessibilityRole={tipo === 'erro' ? 'alert' : 'text'} style={[estilos.mensagem, { borderLeftColor: cor }]}>
-      <Text style={{ color: cores.texto }}>{texto}</Text>
+    <View accessibilityRole={tipo === 'erro' ? 'alert' : 'text'} style={[e.mensagem, estilo]}>
+      <View style={[e.iconeMensagem, { backgroundColor: fundoIcone }]}>
+        <Icone nome={icone} cor={corIcone} tamanho={16} peso="bold" />
+      </View>
+      <Text style={[e.textoMensagem, tipo === 'erro' && { color: t.cores.erro }]}>{texto}</Text>
     </View>
   );
 }
 
-export function Secao({ titulo, children }: { titulo: string; children: ReactNode }) {
+/** Widget: bloco branco arredondado, a unidade de layout do app. */
+export function Widget({ titulo, children, estilo }: { titulo?: string; children: ReactNode; estilo?: StyleProp<ViewStyle> }) {
+  const e = useEstilos(criarEstilos);
   return (
-    <View style={estilos.secao}>
-      <Text accessibilityRole="header" style={estilos.tituloSecao}>
-        {titulo}
-      </Text>
+    <View style={[e.widget, estilo]}>
+      {titulo ? (
+        <Text accessibilityRole="header" style={e.tituloWidget}>
+          {titulo}
+        </Text>
+      ) : null}
       {children}
     </View>
   );
 }
 
 export function Carregando() {
+  const t = useTema();
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: cores.fundo }}>
-      <ActivityIndicator size="large" color={cores.azul} accessibilityLabel="Carregando" />
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: t.cores.fundo }}>
+      <ActivityIndicator size="large" color={t.cores.texto} accessibilityLabel="Carregando" />
     </View>
   );
 }
@@ -128,30 +210,45 @@ export function dataCurta(ms: number): string {
   return `${dois(d.getDate())}/${dois(d.getMonth() + 1)}/${d.getFullYear()}`;
 }
 
-const estilos = StyleSheet.create({
-  botao: { minHeight: 48, borderRadius: 10, paddingHorizontal: 16, alignItems: 'center', justifyContent: 'center' },
-  primario: { backgroundColor: cores.azul },
-  secundario: { backgroundColor: cores.branco, borderWidth: 1, borderColor: cores.azul },
-  perigo: { backgroundColor: cores.branco, borderWidth: 1, borderColor: cores.vermelho },
-  inativo: { opacity: 0.45 },
-  textoBotao: { color: cores.branco, fontSize: 16, fontWeight: '600' },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    minHeight: 40,
-    justifyContent: 'center',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.branco,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  chipSelecionado: { backgroundColor: cores.azul, borderColor: cores.azul },
-  textoChip: { color: cores.texto, fontSize: 14 },
-  selo: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 8, paddingVertical: 2, alignSelf: 'flex-start' },
-  textoSelo: { fontSize: 12, fontWeight: '600' },
-  mensagem: { backgroundColor: cores.branco, borderLeftWidth: 4, padding: 12, borderRadius: 6, marginVertical: 8 },
-  secao: { marginTop: 20 },
-  tituloSecao: { fontSize: 16, fontWeight: '700', color: cores.azulEscuro, marginBottom: 8 },
-});
+const criarEstilos = ({ cores: c }: Tema) =>
+  StyleSheet.create({
+    botao: { minHeight: 56, borderRadius: 28, paddingHorizontal: 20, alignItems: 'center', justifyContent: 'center' },
+    conteudoBotao: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    primario: { backgroundColor: c.destaque },
+    secundario: { backgroundColor: c.cartao, borderWidth: 1.5, borderColor: c.borda },
+    perigo: { backgroundColor: c.erroFundo },
+    fantasma: { backgroundColor: 'transparent', minHeight: 48 },
+    inativo: { opacity: 0.4 },
+    textoBotao: { fontSize: 15.5, fontFamily: fontes.semi },
+    chip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      paddingHorizontal: 14,
+      minHeight: 40,
+      borderRadius: 20,
+      borderWidth: 1.5,
+      borderColor: c.borda,
+      backgroundColor: c.cartao,
+    },
+    chipCompacto: { paddingHorizontal: 11, minHeight: 34, gap: 4 },
+    chipSelecionado: { backgroundColor: c.chipAtivo, borderColor: c.chipAtivo },
+    textoChip: { color: c.texto, fontSize: 14, fontFamily: fontes.media },
+    textoChipCompacto: { fontSize: 13 },
+    textoChipSelecionado: { color: c.chipAtivoTexto, fontFamily: fontes.semi },
+    selo: { borderRadius: 12, paddingHorizontal: 10, paddingVertical: 5, alignSelf: 'flex-start' },
+    textoSelo: { fontSize: 12, fontFamily: fontes.semi },
+    mensagem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      backgroundColor: c.cartao,
+      padding: 12,
+      borderRadius: 20,
+      marginVertical: 6,
+    },
+    iconeMensagem: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+    textoMensagem: { color: c.texto, fontSize: 14, fontFamily: fontes.media, flex: 1, lineHeight: 20 },
+    widget: { backgroundColor: c.cartao, borderRadius: 26, padding: 16 },
+    tituloWidget: { fontSize: 17, fontFamily: fontes.titulo, color: c.texto, marginBottom: 10, letterSpacing: -0.2 },
+  });
