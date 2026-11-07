@@ -2,8 +2,7 @@ import type { ConfigContext, ExpoConfig } from 'expo/config';
 
 /**
  * Completa o app.json com o que depende do ambiente de build.
- * A chave do Google Maps (Android) vem da variável GOOGLE_MAPS_ANDROID_API_KEY, definida no EAS
- * e nunca versionada. Sem ela o app compila, mas o mapa nativo fica em branco.
+ * O mapa nativo usa o MapLibre com os mapas gratuitos do OpenFreeMap: não há chave de API nem conta de cobrança.
  */
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
@@ -13,8 +12,5 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ...config.android,
     package: 'br.univali.bairroalerta',
   },
-  plugins: [
-    ...(config.plugins ?? []),
-    ['react-native-maps', { androidGoogleMapsApiKey: process.env.GOOGLE_MAPS_ANDROID_API_KEY }],
-  ],
+  plugins: [...(config.plugins ?? []), '@maplibre/maplibre-react-native'],
 });

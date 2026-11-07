@@ -44,10 +44,9 @@ Antes do primeiro build:
 
 1. As chaves do Firebase ficam no `.env`, que não vai para o git nem para o EAS. Cadastre as mesmas variáveis
    `EXPO_PUBLIC_*` como variáveis de ambiente do projeto no EAS (painel do Expo ou `eas env:create`).
-2. O mapa no Android precisa de uma chave do Google Maps: projeto no Google Cloud com o **Maps SDK for Android**
-   ativado, chave restrita a apps Android com o nome do pacote e o SHA-1 do certificado que assina o APK
-   (painel do Expo > Credentials). A chave vai no plugin `react-native-maps` (`androidGoogleMapsApiKey`), lida de
-   variável de ambiente pelo `app.config`. Depois de configurar, gere o build de novo.
+2. O mapa do app usa o MapLibre com os mapas do OpenFreeMap (dados do OpenStreetMap): é gratuito, não precisa
+   de chave de API nem de conta de cobrança, então não há nada a configurar. Os créditos obrigatórios
+   ("OpenFreeMap © OpenMapTiles © OpenStreetMap") aparecem no canto do mapa.
 
 **iPhone (alternativa):** instalar no iPhone exige o programa pago da Apple, então quem usa iPhone continua com a
 versão web, publicada no Firebase Hosting:

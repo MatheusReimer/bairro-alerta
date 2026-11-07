@@ -58,5 +58,7 @@ changes status), avisos (notifications), status `aberta | encaminhada | em_andam
   subjects in Portuguese, conventional prefix, optional story number (`feat(#4): ...`).
 - Photos go to the Firestore `fotos` collection (max 1024 px, JPEG 60%, no EXIF, 700 KB rule limit),
   not Cloud Storage, because Storage needs the paid plan.
+- Native map: MapLibre (`@maplibre/maplibre-react-native`) with free OpenFreeMap styles, no API key; keep the
+  OSM attribution visible. The web build shows the illustrated map instead (`Mapa.web.tsx`).
 - No personal data on reports; login errors stay generic.
 - Ask before `npm run publicar` (deploys rules and Hosting to the real project) or `npm run fumaca`.

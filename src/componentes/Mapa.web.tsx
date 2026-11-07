@@ -9,7 +9,7 @@ import { textoApoios } from './ui';
 type Props = { ocorrencias: Ocorrencia[]; aoAbrir: (id: string) => void };
 
 /**
- * No navegador o react-native-maps não funciona. Esta versão mostra o mapa ilustrado com os pontos e uma lista com
+ * No navegador o mapa nativo (MapLibre) não é usado. Esta versão mostra o mapa ilustrado com os pontos e uma lista com
  * link para o OpenStreetMap; o mapa interativo é usado no app do celular.
  */
 export function Mapa({ ocorrencias, aoAbrir }: Props) {
